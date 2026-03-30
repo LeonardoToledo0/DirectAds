@@ -313,7 +313,7 @@ Payload atual do token final:
 - `bcryptjs`: hash e verificacao de senha
 - `@nestjs/swagger` e `swagger-ui-express`: documentacao OpenAPI e UI interativa
 - `class-validator` e `class-transformer`: validacao de DTOs
-- `otplib`: geracao e validacao de codigos TOTP
+- `node:crypto`: geracao e validacao local dos codigos TOTP
 - `qrcode`: geracao do QR code em data URL
 - `jest` e `supertest`: testes automatizados
 - `eslint` e `prettier`: qualidade estatica
@@ -391,3 +391,6 @@ Verifique:
 - [setup.md](e:/directads/docs/setup.md)
 - [api.md](e:/directads/docs/api.md)
 - [tasks-log.md](e:/directads/docs/tasks-log.md)
+
+
+

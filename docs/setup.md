@@ -1,114 +1,114 @@
 # Setup
 
-## Pré-requisitos
+## Pre-requisitos
 
-- Node.js 22 ou compatível
+- Node.js 22 ou compativel
 - Yarn 1.x
 - Docker Desktop
 - Docker Compose
 
-## 1. Instalar dependências
+## 1. Instalar dependencias
 
-`ash
+```bash
 yarn install
-`
+```
 
-## 2. Criar o arquivo .env
+## 2. Criar o arquivo `.env`
 
 Windows:
 
-`ash
+```bash
 copy .env.example .env
-`
+```
 
 Unix:
 
-`ash
+```bash
 cp .env.example .env
-`
+```
 
-Conteúdo base:
+Conteudo base:
 
-`env
+```env
 PORT=3000
 JWT_SECRET="directads-dev-secret"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
 TOTP_APP_NAME="DirectAds"
-`
+```
 
 ## 3. Subir apenas o banco com Docker
 
-`ash
+```bash
 docker compose up -d postgres
-`
+```
 
 ## 4. Gerar o Prisma Client
 
-`ash
+```bash
 yarn db:generate
-`
+```
 
 ## 5. Aplicar as migrations
 
 Desenvolvimento:
 
-`ash
+```bash
 yarn db:migrate:dev
-`
+```
 
-Ambiente não interativo:
+Ambiente nao interativo:
 
-`ash
+```bash
 yarn db:migrate:deploy
-`
+```
 
 ## 6. Executar a seed
 
-`ash
+```bash
 yarn db:seed
-`
+```
 
-Dados de avaliação criados pela seed:
+Dados de avaliacao criados pela seed:
 
-- usuário Leona Silva com email leona@example.com e senha secret123
-- usuário Mario Souza com email mario@example.com e senha secret123
-- usuário Carla Mendes com email carla@example.com e senha secret123
-- tasks distribuídas entre os três usuários com status TODO, IN_PROGRESS e DONE
+- usuario `Leona Silva` com email `leona@example.com` e senha `secret123`
+- usuario `Mario Souza` com email `mario@example.com` e senha `secret123`
+- usuario `Carla Mendes` com email `carla@example.com` e senha `secret123`
+- tasks distribuidas entre os tres usuarios com status `TODO`, `IN_PROGRESS` e `DONE`
 
-## 7. Rodar a aplicação localmente
+## 7. Rodar a aplicacao localmente
 
-`ash
+```bash
 yarn start:dev
-`
+```
 
-URLs úteis:
+URLs uteis:
 
-- API em http://localhost:3000
-- healthcheck em http://localhost:3000/api/health
-- Swagger em http://localhost:3000/api/docs
+- API em `http://localhost:3000`
+- healthcheck em `http://localhost:3000/api/health`
+- Swagger em `http://localhost:3000/api/docs`
 
 ## 8. Rodar tudo com Docker
 
-`ash
+```bash
 docker compose up --build
-`
+```
 
-O backend em container executa yarn db:migrate:deploy antes de iniciar a API.
+O backend em container executa `yarn db:migrate:deploy` antes de iniciar a API.
 
 ## 9. Configurar MFA por TOTP
 
 Fluxo esperado:
 
-1. registre ou faça login com email e senha
-2. chame POST /api/mfa/setup autenticado com JWT
-3. escaneie o qrCodeDataUrl no Microsoft Authenticator ou app equivalente
-4. gere um código de 6 dígitos no app
-5. chame POST /api/mfa/enable com esse código
-6. nos próximos logins, use POST /api/auth/login e depois POST /api/mfa/verify-login
+1. registre ou faca login com email e senha
+2. chame `POST /api/mfa/setup` autenticado com JWT
+3. escaneie o `qrCodeDataUrl` no Microsoft Authenticator ou app equivalente
+4. gere um codigo de 6 digitos no app
+5. chame `POST /api/mfa/enable` com esse codigo
+6. nos proximos logins, use `POST /api/auth/login` e depois `POST /api/mfa/verify-login`
 
-## 10. Rodar validações
+## 10. Rodar validacoes
 
-`ash
+```bash
 yarn lint
 yarn type-check
 yarn build
@@ -117,27 +117,27 @@ yarn test:integration
 yarn test:cov
 yarn test:e2e
 yarn quality:check
-`
+```
 
-## Comandos úteis
+## Comandos uteis
 
 Parar containers:
 
-`ash
+```bash
 docker compose down
-`
+```
 
 Parar containers e remover volumes:
 
-`ash
+```bash
 docker compose down -v
-`
+```
 
 Rebuild completo:
 
-`ash
+```bash
 docker compose up --build
-`
+```
 
 ## Problemas comuns
 
@@ -145,52 +145,52 @@ docker compose up --build
 
 Sintoma:
 
-- Prisma conecta, mas as tabelas ainda não existem
+- Prisma conecta, mas as tabelas ainda nao existem
 
-Ação:
+Acao:
 
-`ash
+```bash
 yarn db:migrate:dev
-`
+```
 
-Ou, em ambiente não interativo:
+Ou, em ambiente nao interativo:
 
-`ash
+```bash
 yarn db:migrate:deploy
-`
+```
 
 ### Prisma Client inconsistente
 
 Sintoma:
 
-- erros de importação ou tipos do Prisma
+- erros de importacao ou tipos do Prisma
 
-Ação:
+Acao:
 
-`ash
+```bash
 yarn db:generate
-`
+```
 
 ### Login passou a exigir token MFA
 
 Sintoma:
 
-- POST /api/auth/login responde com mfaRequired=true
+- `POST /api/auth/login` responde com `mfaRequired=true`
 
-Ação:
+Acao:
 
-- use o mfaToken retornado no body
+- use o `mfaToken` retornado no body
 - abra o Microsoft Authenticator
-- envie o código atual em POST /api/mfa/verify-login
+- envie o codigo atual em `POST /api/mfa/verify-login`
 
-### QR code não foi lido
+### QR code nao foi lido
 
 Sintoma:
 
-- o app autenticador não reconhece o QR code
+- o app autenticador nao reconhece o QR code
 
-Ação:
+Acao:
 
-- verifique se TOTP_APP_NAME está preenchido
-- gere o setup novamente em POST /api/mfa/setup
-- use o otpauthUrl como alternativa para importação manual
+- verifique se `TOTP_APP_NAME` esta preenchido
+- gere o setup novamente em `POST /api/mfa/setup`
+- use o `otpauthUrl` como alternativa para importacao manual

@@ -4,25 +4,25 @@
 
 Documentar a base arquitetural do backend DirectAds no estado atual do projeto.
 
-## Direção arquitetural
+## Direcao arquitetural
 
-O backend segue uma organização modular inspirada em Clean Architecture para manter:
+O backend segue uma organizacao modular inspirada em Clean Architecture para manter:
 
-- regra de negócio fora de controllers
+- regra de negocio fora de controllers
 - infraestrutura isolada
-- casos de uso explícitos
-- baixo acoplamento entre framework e domínio
-- facilidade de teste e evolução
+- casos de uso explicitos
+- baixo acoplamento entre framework e dominio
+- facilidade de teste e evolucao
 
 ## Camadas
 
 ### Presentation
 
-Responsável por:
+Responsavel por:
 
-- receber requisições HTTP
+- receber requisicoes HTTP
 - expor endpoints
-- delegar execução para casos de uso
+- delegar execucao para casos de uso
 - serializar respostas
 - documentar contratos no Swagger
 
@@ -35,11 +35,11 @@ No estado atual:
 
 ### Application
 
-Responsável por:
+Responsavel por:
 
-- orquestrar os fluxos da aplicação
+- orquestrar os fluxos da aplicacao
 - centralizar casos de uso
-- coordenar regras de entrada e saída
+- coordenar regras de entrada e saida
 
 No estado atual:
 
@@ -58,9 +58,9 @@ No estado atual:
 
 ### Domain
 
-Responsável por:
+Responsavel por:
 
-- contratos de domínio
+- contratos de dominio
 - entidades
 - invariantes
 
@@ -74,11 +74,11 @@ No estado atual:
 
 ### Infrastructure
 
-Responsável por:
+Responsavel por:
 
 - Prisma
-- conexão com banco
-- implementação concreta de dependências externas
+- conexao com banco
+- implementacao concreta de dependencias externas
 
 No estado atual:
 
@@ -86,56 +86,57 @@ No estado atual:
 - [prisma.module.ts](e:/directads/src/prisma/prisma.module.ts)
 - [prisma-task.repository.ts](e:/directads/src/modules/tasks/infrastructure/repositories/prisma-task.repository.ts)
 - [otplib-totp.provider.ts](e:/directads/src/modules/mfa/infrastructure/providers/otplib-totp.provider.ts)
+- [totp.utils.ts](e:/directads/src/modules/mfa/infrastructure/providers/totp.utils.ts)
 
-## Organização de módulos
+## Organizacao de modulos
 
-Hoje os módulos implementados são:
+Hoje os modulos implementados sao:
 
-- health
-- prisma
-- uth
-- 	asks
-- mfa
+- `health`
+- `prisma`
+- `auth`
+- `tasks`
+- `mfa`
 
-### Módulo auth
+### Modulo auth
 
-Função:
+Funcao:
 
-- registrar usuários
+- registrar usuarios
 - autenticar por email e senha
 - emitir JWT
-- retornar um token temporário de segunda etapa quando o MFA estiver habilitado
-- expor o usuário autenticado
+- retornar um token temporario de segunda etapa quando o MFA estiver habilitado
+- expor o usuario autenticado
 
-### Módulo tasks
+### Modulo tasks
 
-Função:
+Funcao:
 
-- expor o CRUD completo do domínio principal
-- preservar ownership por usuário em todas as operações
+- expor o CRUD completo do dominio principal
+- preservar ownership por usuario em todas as operacoes
 - documentar o contrato HTTP no Swagger
 
-### Módulo mfa
+### Modulo mfa
 
-Função:
+Funcao:
 
-- gerar secret TOTP por usuário autenticado
-- devolver QR code e otpauthUrl para cadastro no app autenticador
-- confirmar o primeiro código TOTP e ativar MFA
-- concluir o login em segunda etapa quando mfaEnabled=true
+- gerar secret TOTP por usuario autenticado
+- devolver QR code e `otpauthUrl` para cadastro no app autenticador
+- confirmar o primeiro codigo TOTP e ativar MFA
+- concluir o login em segunda etapa quando `mfaEnabled=true`
 
-## Bootstrap da aplicação
+## Bootstrap da aplicacao
 
 Arquivo principal:
 
 - [main.ts](e:/directads/src/main.ts)
 
-Configurações atuais:
+Configuracoes atuais:
 
-- prefixo global /api
-- ValidationPipe global
-- integração do ciclo de vida com Prisma
-- Swagger em /api/docs
+- prefixo global `/api`
+- `ValidationPipe` global
+- integracao do ciclo de vida com Prisma
+- Swagger em `/api/docs`
 
 ## Banco de dados
 
@@ -145,32 +146,32 @@ Arquivo principal do schema:
 
 Modelagem atual:
 
-- tabela users
-- tabela 	asks
+- tabela `users`
+- tabela `tasks`
 - UUID como identificador
-- email com unicidade
-- User.mfaSecret, User.mfaEnabled e User.mfaConfirmedAt para o fluxo TOTP
-- Task.userId como ownership explícito
-- enum TaskStatus para o ciclo principal da entidade
-- timestamps de criação e atualização
+- `email` com unicidade
+- `User.mfaSecret`, `User.mfaEnabled` e `User.mfaConfirmedAt` para o fluxo TOTP
+- `Task.userId` como ownership explicito
+- enum `TaskStatus` para o ciclo principal da entidade
+- timestamps de criacao e atualizacao
 
-## Decisões arquiteturais já tomadas
+## Decisoes arquiteturais ja tomadas
 
-- Prisma fica isolado em um módulo próprio
-- o backend sobe com ambiente reproduzível via Docker
-- o projeto já nasce com testes e quality gates
-- a documentação acompanha a evolução por task
-- o CRUD principal aplica ownership no caso de uso e no acesso ao repositório
-- o contrato HTTP do domínio principal é documentado diretamente no Swagger do módulo
-- o MFA usa TOTP compatível com Microsoft Authenticator, mantendo o backend independente de login federado externo
-- a segunda etapa de login usa um mfaToken temporário assinado para evitar emissão prematura do JWT final
-- o container do backend aplica migrations automaticamente na inicialização para reduzir atrito na avaliação
+- Prisma fica isolado em um modulo proprio
+- o backend sobe com ambiente reproduzivel via Docker
+- o projeto ja nasce com testes e quality gates
+- a documentacao acompanha a evolucao por task
+- o CRUD principal aplica ownership no caso de uso e no acesso ao repositorio
+- o contrato HTTP do dominio principal e documentado diretamente no Swagger do modulo
+- o MFA usa TOTP compativel com Microsoft Authenticator, mantendo o backend independente de login federado externo
+- a segunda etapa de login usa um `mfaToken` temporario assinado para evitar emissao prematura do JWT final
+- o container do backend aplica migrations automaticamente na inicializacao para reduzir atrito na avaliacao
 
 ## Estado final da arquitetura
 
-- módulos principais implementados e documentados
-- autenticação JWT pronta para uso
-- domínio principal com CRUD completo e ownership
+- modulos principais implementados e documentados
+- autenticacao JWT pronta para uso
+- dominio principal com CRUD completo e ownership
 - MFA por TOTP com QR code funcional
-- seed de avaliação reproduzível
+- seed de avaliacao reproduzivel
 - quality gates automatizados e validados

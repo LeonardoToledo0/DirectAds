@@ -4,78 +4,78 @@
 
 Ambiente local:
 
-- http://localhost:3000
+- `http://localhost:3000`
 
 Todos os endpoints usam o prefixo global:
 
-- /api
+- `/api`
 
 ## Swagger
 
-Documentação interativa disponível em:
+Documentacao interativa disponivel em:
 
-- http://localhost:3000/api/docs
+- `http://localhost:3000/api/docs`
 
 Documento OpenAPI em JSON:
 
-- http://localhost:3000/api/docs-json
+- `http://localhost:3000/api/docs-json`
 
-## Endpoints disponíveis
+## Endpoints disponiveis
 
-### GET /api/health
+### `GET /api/health`
 
-Função:
+Funcao:
 
-- verificar se a API está ativa
+- verificar se a API esta ativa
 - confirmar que o backend subiu corretamente
 
 Resposta esperada:
 
-`json
+```json
 {
   "status": "ok",
   "service": "directads-backend",
   "timestamp": "2026-03-30T00:00:00.000Z"
 }
-`
+```
 
-### POST /api/auth/register
+### `POST /api/auth/register`
 
-Função:
+Funcao:
 
-- registrar um novo usuário
-- retornar JWT e dados públicos do usuário
+- registrar um novo usuario
+- retornar JWT e dados publicos do usuario
 
 Payload:
 
-`json
+```json
 {
   "name": "Leona",
   "email": "leona@example.com",
   "password": "secret123"
 }
-`
+```
 
-### POST /api/auth/login
+### `POST /api/auth/login`
 
-Função:
+Funcao:
 
-- autenticar um usuário por email e senha
-- retornar JWT diretamente quando o MFA ainda não estiver habilitado
-- retornar mfaRequired=true e mfaToken temporário quando o MFA TOTP estiver habilitado
+- autenticar um usuario por email e senha
+- retornar JWT diretamente quando o MFA ainda nao estiver habilitado
+- retornar `mfaRequired=true` e `mfaToken` temporario quando o MFA TOTP estiver habilitado
 
 Payload:
 
-`json
+```json
 {
   "email": "leona@example.com",
   "password": "secret123"
 }
-`
+```
 
 Resposta sem MFA habilitado:
 
-`json
+```json
 {
   "mfaRequired": false,
   "accessToken": "jwt-final",
@@ -88,11 +88,11 @@ Resposta sem MFA habilitado:
     "updatedAt": "2026-03-30T00:00:00.000Z"
   }
 }
-`
+```
 
 Resposta com MFA habilitado:
 
-`json
+```json
 {
   "mfaRequired": true,
   "mfaToken": "jwt-temporario-para-segunda-etapa",
@@ -105,150 +105,150 @@ Resposta com MFA habilitado:
     "updatedAt": "2026-03-30T00:00:00.000Z"
   }
 }
-`
+```
 
-### GET /api/auth/me
+### `GET /api/auth/me`
 
-Função:
+Funcao:
 
-- retornar os dados do usuário autenticado
-
-Requer:
-
-- Authorization: Bearer <token>
-
-### POST /api/mfa/setup
-
-Função:
-
-- gerar um secret TOTP para o usuário autenticado
-- devolver otpauthUrl e qrCodeDataUrl
-- permitir escanear o QR code em apps compatíveis como Microsoft Authenticator
+- retornar os dados do usuario autenticado
 
 Requer:
 
-- Authorization: Bearer <token>
+- `Authorization: Bearer <token>`
+
+### `POST /api/mfa/setup`
+
+Funcao:
+
+- gerar um secret TOTP para o usuario autenticado
+- devolver `otpauthUrl` e `qrCodeDataUrl`
+- permitir escanear o QR code em apps compativeis como Microsoft Authenticator
+
+Requer:
+
+- `Authorization: Bearer <token>`
 
 Resposta esperada:
 
-`json
+```json
 {
   "secret": "BASE32SECRET",
   "otpauthUrl": "otpauth://totp/DirectAds:leona%40example.com?secret=BASE32SECRET&issuer=DirectAds&period=30",
   "qrCodeDataUrl": "data:image/png;base64,..."
 }
-`
+```
 
-### POST /api/mfa/enable
+### `POST /api/mfa/enable`
 
-Função:
+Funcao:
 
-- confirmar o primeiro código TOTP
-- ativar o MFA no usuário
+- confirmar o primeiro codigo TOTP
+- ativar o MFA no usuario
 
 Requer:
 
-- Authorization: Bearer <token>
+- `Authorization: Bearer <token>`
 
 Payload:
 
-`json
+```json
 {
   "code": "123456"
 }
-`
+```
 
-### POST /api/mfa/verify-login
+### `POST /api/mfa/verify-login`
 
-Função:
+Funcao:
 
-- concluir o login quando POST /api/auth/login responder com mfaRequired=true
-- validar o mfaToken temporário e o código TOTP atual
+- concluir o login quando `POST /api/auth/login` responder com `mfaRequired=true`
+- validar o `mfaToken` temporario e o codigo TOTP atual
 - emitir o JWT final da API
 
 Payload:
 
-`json
+```json
 {
   "mfaToken": "jwt-temporario-para-segunda-etapa",
   "code": "123456"
 }
-`
+```
 
 ## CRUD de tasks
 
-Todos os endpoints de 	asks exigem autenticação JWT.
+Todos os endpoints de `tasks` exigem autenticacao JWT.
 
-### POST /api/tasks
+### `POST /api/tasks`
 
 Payload:
 
-`json
+```json
 {
   "title": "Preparar demonstracao tecnica",
   "description": "Organizar roteiro e validacoes",
   "status": "TODO"
 }
-`
+```
 
-### GET /api/tasks
+### `GET /api/tasks`
 
 Exemplos:
 
-`	xt
+```txt
 http://localhost:3000/api/tasks
 http://localhost:3000/api/tasks?status=IN_PROGRESS
-`
+```
 
-### GET /api/tasks/:taskId
+### `GET /api/tasks/:taskId`
 
-Busca uma task específica do usuário autenticado.
+Busca uma task especifica do usuario autenticado.
 
-### PATCH /api/tasks/:taskId
+### `PATCH /api/tasks/:taskId`
 
 Payload de exemplo:
 
-`json
+```json
 {
   "status": "DONE",
   "description": null
 }
-`
+```
 
-### DELETE /api/tasks/:taskId
+### `DELETE /api/tasks/:taskId`
 
-Remove uma task do usuário autenticado.
+Remove uma task do usuario autenticado.
 
 ## Regras do fluxo MFA por TOTP
 
-- o setup do MFA é feito depois do cadastro ou depois de um login normal já autenticado
-- o endpoint POST /api/mfa/setup sempre gera um novo secret e invalida qualquer configuração anterior ainda não confirmada
-- o endpoint POST /api/mfa/enable ativa o MFA somente após validar um código TOTP válido
-- quando mfaEnabled=true, o login deixa de entregar o JWT final na primeira etapa
-- a segunda etapa deve ser concluída em POST /api/mfa/verify-login
-- o TOTP é compatível com Microsoft Authenticator, Google Authenticator e apps equivalentes
+- o setup do MFA e feito depois do cadastro ou depois de um login normal ja autenticado
+- o endpoint `POST /api/mfa/setup` sempre gera um novo `secret` e invalida qualquer configuracao anterior ainda nao confirmada
+- o endpoint `POST /api/mfa/enable` ativa o MFA somente apos validar um codigo TOTP valido
+- quando `mfaEnabled=true`, o login deixa de entregar o JWT final na primeira etapa
+- a segunda etapa deve ser concluida em `POST /api/mfa/verify-login`
+- o TOTP e compativel com Microsoft Authenticator, Google Authenticator e apps equivalentes
 
 ## Regras de ownership
 
-- um usuário só enxerga as próprias tasks
-- acesso a task de outro usuário retorna 404
-- criação, atualização e remoção operam sempre no contexto do usuário autenticado
+- um usuario so enxerga as proprias tasks
+- acesso a task de outro usuario retorna `404`
+- criacao, atualizacao e remocao operam sempre no contexto do usuario autenticado
 
-## Dados de avaliação sugeridos
+## Dados de avaliacao sugeridos
 
-Após yarn db:seed, o ambiente local fica com:
+Apos `yarn db:seed`, o ambiente local fica com:
 
-- leona@example.com / secret123
-- mario@example.com / secret123
-- carla@example.com / secret123
+- `leona@example.com / secret123`
+- `mario@example.com / secret123`
+- `carla@example.com / secret123`
 
 ## Status codes relevantes
 
-- 200 OK
-- 201 Created
-- 401 Unauthorized
-- 404 Not Found
-- 409 Conflict
+- `200 OK`
+- `201 Created`
+- `401 Unauthorized`
+- `404 Not Found`
+- `409 Conflict`
 
 ## Estado final da API
 
