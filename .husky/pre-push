@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+yarn lint
+yarn type-check
+yarn build
+yarn test
+yarn test:integration
+yarn test:cov
+yarn test:e2e
