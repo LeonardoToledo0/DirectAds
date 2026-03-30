@@ -7,7 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "quality:check": "yarn lint && yarn type-check && yarn build && yarn test && yarn test:integration && yarn test:cov && yarn test:e2e",
     "db:generate": "prisma generate",
+    "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:dev": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
@@ -15,18 +17,18 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" \"*.{js,json,md,yml}\"",
     "prepare": "husky",
     "start": "nest start",
-    "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
+    "start:dev": "nest start --watch",
     "start:prod": "node dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "type-check": "tsc --noEmit",
     "test": "jest --runInBand",
-    "test:watch": "jest --watch",
     "test:cov": "jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
-    "test:unit": "jest --runInBand",
     "test:integration": "jest --config ./test/jest-integration.json --runInBand",
+    "test:unit": "jest --runInBand",
+    "test:watch": "jest --watch",
     "commitlint": "commitlint --from=HEAD~1 --to=HEAD"
   },
   "prisma": {
@@ -117,3 +119,4 @@
     ]
   }
 }
+

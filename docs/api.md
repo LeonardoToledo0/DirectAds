@@ -202,6 +202,14 @@ Payload:
 - o usuário local é vinculado por `microsoftAccountId` quando aplicável
 - quando não existe usuário local, o backend cria um automaticamente e emite o JWT local
 
+## Dados de avaliação sugeridos
+
+Após `yarn db:seed`, o ambiente local fica com:
+
+- `leona@example.com / secret123`
+- `mario@example.com / secret123`
+- `microsoft.user@example.com / secret123`
+
 ## Status codes relevantes
 
 - `200 OK`
@@ -219,9 +227,10 @@ Payload atual do token:
 - `sub`
 - `email`
 
-## Roadmap da API
+## Estado final da API
 
-Próximos blocos previstos:
-
-- seed final de avaliação
-- revisão final de entrega
+- healthcheck funcional
+- auth JWT funcional
+- CRUD principal funcional
+- Microsoft MFA funcional para ambiente local e testes
+- Swagger funcional e alinhado ao contrato real

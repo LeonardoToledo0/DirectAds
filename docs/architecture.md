@@ -178,9 +178,13 @@ Modelagem atual:
 - o contrato HTTP do domínio principal é documentado diretamente no Swagger do módulo
 - o fluxo Microsoft MFA usa provider desacoplado para permitir troca futura pelo SDK real sem afetar os casos de uso
 - o ambiente local usa provider mockado e reproduzível para manter os testes automatizados estáveis
+- o container do backend aplica migrations automaticamente na inicialização para reduzir atrito na avaliação
 
-## Próximos passos arquiteturais
+## Estado final da arquitetura
 
-- revisar a seed com dados úteis para avaliacao
-- fortalecer o checklist final de entrega
-- revisar detalhes finais de docker, scripts e documentacao
+- módulos principais implementados e documentados
+- autenticação JWT pronta para uso
+- domínio principal com CRUD completo e ownership
+- fluxo Microsoft MFA funcional para ambiente local e testes
+- seed de avaliação reproduzível
+- quality gates automatizados e validados

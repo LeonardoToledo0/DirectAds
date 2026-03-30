@@ -28,9 +28,23 @@ services:
         condition: service_healthy
     environment:
       PORT: 3000
+      JWT_SECRET: directads-dev-secret
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/directads?schema=public
+      MICROSOFT_CLIENT_ID: directads-local-client
+      MICROSOFT_TENANT_ID: common
+      MICROSOFT_REDIRECT_URI: http://localhost:3000/auth/microsoft/callback
+      MICROSOFT_MOCK_AUTH_CODE: mock-microsoft-auth-code
+      MICROSOFT_MOCK_VERIFICATION_CODE: '123456'
+      MICROSOFT_MOCK_USER_ID: microsoft-user-1
+      MICROSOFT_MOCK_USER_EMAIL: microsoft.user@example.com
+      MICROSOFT_MOCK_USER_NAME: Microsoft User
     ports:
       - '3000:3000'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/api/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 volumes:
   postgres_data:

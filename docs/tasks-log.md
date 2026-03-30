@@ -80,3 +80,13 @@
 - Decisoes: usar upsert para tornar a seed reproduzivel; popular tres usuarios de avaliacao com senha conhecida `secret123`; incluir um usuario ja vinculado ao fluxo Microsoft por `microsoftAccountId`; distribuir tasks com os tres status do dominio para facilitar demonstracao manual da API
 - Testes: `yarn db:seed`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `chore(backend): add database seed for evaluation`
+
+## TASK-BE-010 - Fortalecimento final de qualidade
+
+- Status: concluida
+- Objetivo: revisar consistencia final da entrega, endurecer o ambiente Docker, padronizar scripts de validacao e alinhar a documentacao ao estado final do backend
+- Arquivos principais: `package.json`, `Dockerfile`, `docker-compose.yml`, `README.md`, `docs/setup.md`, `docs/architecture.md`, `docs/api.md`, `docs/tasks-log.md`
+- Decisoes: adicionar script `yarn quality:check` para consolidar os quality gates; adicionar `yarn db:migrate:deploy` para ambiente nao interativo; fazer o container do backend aplicar migrations antes do start; explicitar variaveis de auth e MFA no `docker-compose`; adicionar healthcheck do backend e encerrar a documentacao com o roadmap completo como concluido
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`, `docker compose up --build -d backend`, `GET http://localhost:3000/api/health`, `GET http://localhost:3000/api/docs-json`
+- Commit sugerido: `chore(backend): finalize backend quality gates and delivery readiness`
+

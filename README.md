@@ -24,6 +24,7 @@ No estado atual, o backend ja possui:
 - entidade principal `Task` modelada com ownership por usuario
 - CRUD HTTP completo de `tasks` com filtro por status
 - fluxo Microsoft MFA desacoplado e testavel com provider mockado
+- scripts de validacao e deploy local do banco prontos para avaliacao
 - lint, build e testes automatizados
 - Husky, lint-staged e commitlint
 
@@ -136,6 +137,8 @@ yarn start:dev
 docker compose up --build
 ```
 
+O backend em container agora aplica `yarn db:migrate:deploy` antes de subir a aplicacao.
+
 Servicos expostos:
 
 - API: `http://localhost:3000`
@@ -172,6 +175,7 @@ Comandos uteis:
 ```bash
 yarn db:generate
 yarn db:migrate:dev
+yarn db:migrate:deploy
 yarn db:seed
 ```
 
@@ -187,8 +191,10 @@ yarn test
 yarn test:integration
 yarn test:cov
 yarn test:e2e
+yarn quality:check
 yarn db:generate
 yarn db:migrate:dev
+yarn db:migrate:deploy
 yarn db:seed
 ```
 
@@ -208,6 +214,7 @@ yarn test
 yarn test:integration
 yarn test:cov
 yarn test:e2e
+yarn quality:check
 ```
 
 ## API disponivel neste momento
@@ -336,8 +343,8 @@ Valores mock padrao para ambiente local:
 - concluido: modelagem da entidade principal e contratos de repositorio
 - concluido: CRUD principal via HTTP
 - concluido: MFA Microsoft
-- proximo: seed final de avaliacao
-- depois: fortalecimento final de qualidade
+- concluido: seed final de avaliacao
+- concluido: fortalecimento final de qualidade
 
 ## Troubleshooting
 
@@ -346,6 +353,11 @@ Valores mock padrao para ambiente local:
 ```bash
 docker compose up --build
 ```
+
+Verifique tambem:
+
+- se o container `backend` ficou saudavel
+- se o backend conseguiu aplicar `yarn db:migrate:deploy` na inicializacao
 
 ### Erro de conexao com o banco
 
@@ -375,3 +387,4 @@ Verifique:
 - [setup.md](e:/directads/docs/setup.md)
 - [api.md](e:/directads/docs/api.md)
 - [tasks-log.md](e:/directads/docs/tasks-log.md)
+

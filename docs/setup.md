@@ -63,8 +63,16 @@ yarn db:generate
 
 ## 5. Aplicar as migrations
 
+Ambiente de desenvolvimento:
+
 ```bash
 yarn db:migrate:dev
+```
+
+Ambiente de avaliacao ou container:
+
+```bash
+yarn db:migrate:deploy
 ```
 
 ## 6. Executar a seed
@@ -94,11 +102,17 @@ Healthcheck:
 
 - `http://localhost:3000/api/health`
 
+Swagger:
+
+- `http://localhost:3000/api/docs`
+
 ## 8. Rodar tudo com Docker
 
 ```bash
 docker compose up --build
 ```
+
+O backend em container executa `yarn db:migrate:deploy` antes de iniciar a API.
 
 Serviços expostos:
 
@@ -115,6 +129,7 @@ yarn test
 yarn test:integration
 yarn test:cov
 yarn test:e2e
+yarn quality:check
 ```
 
 ## Comandos úteis
@@ -162,6 +177,12 @@ Ação:
 yarn db:migrate:dev
 ```
 
+Ou, em contexto não interativo:
+
+```bash
+yarn db:migrate:deploy
+```
+
 ### Prisma Client inconsistente
 
 Sintoma:
@@ -185,3 +206,4 @@ Ação:
 ```bash
 yarn db:seed
 ```
+
