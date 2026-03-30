@@ -44,3 +44,12 @@
 - Decisoes: manter o Swagger sempre habilitado nesta fase; publicar UI em `/api/docs` e JSON em `/api/docs-json`; aplicar bearer auth apenas na rota protegida `GET /api/auth/me`
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, smoke test de `GET /api/docs` e validacao de `GET /api/docs-json`
 - Commit sugerido: `docs(backend): configure swagger documentation`
+
+## TASK-BE-006 - Entidade principal de negocio
+
+- Status: concluida
+- Objetivo: modelar a entidade principal `Task`, criar migration, contratos de repositorio e casos de uso de CRUD sem antecipar a exposicao HTTP da proxima task
+- Arquivos principais: `prisma/schema.prisma`, `prisma/migrations/20260330204209_add_tasks_entity/`, `src/modules/tasks/`, `src/app.module.ts`, `README.md`, `docs/architecture.md`, `docs/api.md`
+- Decisoes: usar `Task` como entidade principal do MVP com ownership explicito por `userId`; adotar enum de status `TODO`, `IN_PROGRESS` e `DONE`; concentrar o acesso a persistencia em `PrismaTaskRepository`; preparar DTOs e use cases agora e deixar os endpoints REST para a TASK-BE-007
+- Testes: `yarn db:generate`, `yarn db:migrate:dev --name add_tasks_entity`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
+- Commit sugerido: `feat(backend): add main domain entity and repository contracts`

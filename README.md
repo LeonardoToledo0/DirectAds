@@ -16,11 +16,13 @@ No estado atual, o backend ja possui:
 
 - NestJS com TypeScript
 - PostgreSQL via Docker
-- Prisma com migration inicial
+- Prisma com migrations versionadas
 - seed preparada
 - healthcheck
 - autenticacao JWT com registro, login e rota protegida
 - Swagger em `/api/docs`
+- entidade principal `Task` modelada com ownership por usuario
+- casos de uso e repositorio para o dominio principal
 - lint, build e testes automatizados
 - Husky, lint-staged e commitlint
 
@@ -53,6 +55,7 @@ Modulos implementados ate aqui:
 - `health`
 - `prisma`
 - `auth`
+- `tasks`
 
 Mais detalhes em [architecture.md](e:/directads/docs/architecture.md).
 
@@ -63,6 +66,7 @@ src/
   modules/
     auth/
     health/
+    tasks/
   prisma/
   common/
   app.module.ts
@@ -149,6 +153,8 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=pub
 - PostgreSQL como banco principal
 - Prisma como ORM
 - entidade `User` com `email` unico e `passwordHash`
+- entidade `Task` vinculada a `User` por `userId`
+- enum `TaskStatus` com `TODO`, `IN_PROGRESS` e `DONE`
 
 Comandos uteis:
 
@@ -209,6 +215,8 @@ O endpoint `GET /api/auth/me` exige:
 
 - `Authorization: Bearer <token>`
 
+A modelagem do dominio `Task` ja foi adicionada internamente, mas os endpoints HTTP de CRUD entram na proxima task.
+
 Documentacao detalhada da API: [api.md](e:/directads/docs/api.md)
 
 ## Swagger
@@ -265,7 +273,8 @@ Ainda nao implementado.
 - concluido: documentacao base
 - concluido: autenticacao JWT
 - concluido: Swagger
-- proximo: CRUD principal
+- concluido: modelagem da entidade principal e contratos de repositorio
+- proximo: CRUD principal via HTTP
 - depois: MFA Microsoft
 
 ## Troubleshooting

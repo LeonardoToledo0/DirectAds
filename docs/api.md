@@ -90,7 +90,29 @@ Requer:
 
 - header `Authorization: Bearer <token>`
 
-### Status codes relevantes
+## Modelagem pronta para a próxima task
+
+O domínio principal já foi preparado internamente com a entidade `Task`.
+
+Campos principais:
+
+- `id`
+- `title`
+- `description`
+- `status`
+- `userId`
+- `createdAt`
+- `updatedAt`
+
+Status disponíveis:
+
+- `TODO`
+- `IN_PROGRESS`
+- `DONE`
+
+Nesta etapa ainda não há endpoints HTTP para `tasks`; eles entram na TASK-BE-007.
+
+## Status codes relevantes
 
 - `200 OK`
 - `201 Created`
@@ -110,5 +132,5 @@ Payload atual do token:
 
 Próximos blocos previstos:
 
-- CRUD do domínio principal
+- CRUD HTTP do domínio `tasks`
 - MFA Microsoft
