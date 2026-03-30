@@ -1,0 +1,29 @@
+import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
+
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit {
+  constructor() {
+    super({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL,
+        },
+      },
+    });
+  }
+
+  async onModuleInit(): Promise<void> {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
+    await this.$connect();
+  }
+
+  enableShutdownHooks(app: INestApplication): void {
+    process.once('beforeExit', () => {
+      void app.close();
+    });
+  }
+}

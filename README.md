@@ -1,16 +1,20 @@
 # DirectAds Backend
 
-Backend em NestJS para o teste técnico da aplicação DirectAds.
+Backend em NestJS para o teste tecnico da aplicacao DirectAds.
 
 ## Status atual
 
-O projeto está em fase de bootstrap arquitetural.
+O projeto esta na etapa de infraestrutura inicial de banco e execucao local.
 
-Nesta etapa já existe:
+Nesta etapa ja existe:
 
 - base em NestJS com TypeScript
-- módulo inicial de healthcheck
-- estrutura inicial alinhada a uma organização modular
+- modulo inicial de healthcheck
+- estrutura inicial alinhada a uma organizacao modular
+- Prisma configurado com schema inicial
+- PostgreSQL preparado para execucao em Docker
+- migration inicial versionada
+- seed inicial preparada
 - scripts de qualidade
 - hooks de commit com Husky
 
@@ -18,6 +22,10 @@ Nesta etapa já existe:
 
 - NestJS
 - TypeScript
+- PostgreSQL
+- Prisma
+- Docker
+- Docker Compose
 - Jest
 - ESLint
 - Prettier
@@ -35,9 +43,61 @@ yarn build
 yarn test
 yarn test:cov
 yarn test:e2e
+yarn db:generate
+yarn db:migrate:dev
+yarn db:seed
 ```
 
-## Endpoint disponível nesta fase
+## Ambiente
+
+Copie `.env.example` para `.env` e ajuste os valores se necessario.
+
+```bash
+copy .env.example .env
+```
+
+Variaveis principais:
+
+```env
+PORT=3000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
+```
+
+## Subindo com Docker
+
+Banco de dados:
+
+```bash
+docker-compose up -d postgres
+```
+
+Aplicacao e banco:
+
+```bash
+docker-compose up --build
+```
+
+## Prisma
+
+Gerar client:
+
+```bash
+yarn db:generate
+```
+
+Criar/aplicar migrations em ambiente local:
+
+```bash
+yarn db:migrate:dev
+```
+
+Executar seed:
+
+```bash
+yarn db:seed
+```
+
+## Endpoint disponivel nesta fase
 
 ```txt
 GET /api/health
@@ -53,11 +113,10 @@ Resposta esperada:
 }
 ```
 
-## Próximas etapas
+## Proximas etapas
 
-- Docker + PostgreSQL + Prisma
-- documentação base completa
-- autenticação JWT
+- documentacao base completa
+- autenticacao JWT
 - Swagger
 - CRUD principal
 - MFA Microsoft
