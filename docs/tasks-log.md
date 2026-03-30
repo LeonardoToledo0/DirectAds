@@ -147,4 +147,5 @@
 - Decisoes: separar lint, type-check, build, unit, integration, coverage e e2e em steps distintos; habilitar `HUSKY=0` e `CI=true` no workflow para evitar efeitos colaterais de hooks locais; manter `yarn quality:check` apenas como gate local consolidado
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
 - Endpoints afetados: nenhum
+- Commit realizado: `1ed1d71` - `fix(backend): harden github actions workflow diagnostics`
 - Commit sugerido: `fix(backend): harden github actions workflow diagnostics`
