@@ -31,7 +31,16 @@ Conteúdo esperado inicialmente:
 
 ```env
 PORT=3000
+JWT_SECRET="directads-dev-secret"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
+MICROSOFT_CLIENT_ID="directads-local-client"
+MICROSOFT_TENANT_ID="common"
+MICROSOFT_REDIRECT_URI="http://localhost:3000/auth/microsoft/callback"
+MICROSOFT_MOCK_AUTH_CODE="mock-microsoft-auth-code"
+MICROSOFT_MOCK_VERIFICATION_CODE="123456"
+MICROSOFT_MOCK_USER_ID="microsoft-user-1"
+MICROSOFT_MOCK_USER_EMAIL="microsoft.user@example.com"
+MICROSOFT_MOCK_USER_NAME="Microsoft User"
 ```
 
 ## 3. Subir apenas o banco com Docker
@@ -52,7 +61,7 @@ docker compose ps
 yarn db:generate
 ```
 
-## 5. Aplicar a migration inicial
+## 5. Aplicar as migrations
 
 ```bash
 yarn db:migrate:dev
@@ -63,6 +72,13 @@ yarn db:migrate:dev
 ```bash
 yarn db:seed
 ```
+
+Dados de avaliação criados pela seed:
+
+- usuário `Leona Silva` com email `leona@example.com` e senha `secret123`
+- usuário `Mario Souza` com email `mario@example.com` e senha `secret123`
+- usuário `Microsoft User` com email `microsoft.user@example.com`, senha `secret123` e vínculo `microsoftAccountId=microsoft-user-1`
+- tasks distribuídas entre os três usuários com status `TODO`, `IN_PROGRESS` e `DONE`
 
 ## 7. Rodar a aplicação localmente
 
@@ -156,4 +172,16 @@ Ação:
 
 ```bash
 yarn db:generate
+```
+
+### Seed sem dados esperados
+
+Sintoma:
+
+- usuários e tasks de avaliação não aparecem no banco
+
+Ação:
+
+```bash
+yarn db:seed
 ```
