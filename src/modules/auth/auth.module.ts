@@ -8,15 +8,10 @@ import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 import { PasswordService } from './application/services/password.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { getJwtModuleOptions } from '../../config/auth/jwt.config';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'directads-dev-secret',
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
+  imports: [PassportModule, JwtModule.register(getJwtModuleOptions())],
   controllers: [AuthController],
   providers: [
     PasswordService,

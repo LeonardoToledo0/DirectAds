@@ -1258,6 +1258,36 @@ A execução deste backend deve ser dividida nas tasks abaixo.
 
 `fix(backend): harden github actions workflow diagnostics`
 
+
+### TASK-BE-016 — Correção da cobertura de branches no CI
+
+**Objetivo**
+
+- eliminar a divergencia de branch coverage entre ambiente local e GitHub Actions
+- centralizar a configuracao de JWT em helper testavel
+- garantir 100% de coverage no `yarn test:cov` em qualquer ambiente
+
+**Entregáveis**
+
+- helper de configuracao JWT reutilizado pelos modulos e strategy
+- testes cobrindo fallback e valor configurado por `JWT_SECRET`
+- log da task atualizado com o hotfix de cobertura
+
+**Testes**
+
+- `yarn lint`
+- `yarn type-check`
+- `yarn build`
+- `yarn test`
+- `yarn test:integration`
+- `yarn test:cov`
+- `yarn test:e2e`
+- `yarn quality:check`
+
+**Commit sugerido**
+
+`fix(backend): restore branch coverage parity in ci`
+
 ---
 
 ## 27. Checklist Automático por Task

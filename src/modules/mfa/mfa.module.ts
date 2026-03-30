@@ -7,14 +7,10 @@ import { SetupTotpMfaUseCase } from './application/use-cases/setup-totp-mfa.use-
 import { VerifyTotpLoginUseCase } from './application/use-cases/verify-totp-login.use-case';
 import { TOTP_PROVIDER } from './domain/interfaces/totp-provider.interface';
 import { OtplibTotpProvider } from './infrastructure/providers/otplib-totp.provider';
+import { getJwtModuleOptions } from '../../config/auth/jwt.config';
 
 @Module({
-  imports: [
-    JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'directads-dev-secret',
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
+  imports: [JwtModule.register(getJwtModuleOptions())],
   controllers: [MfaController],
   providers: [
     {

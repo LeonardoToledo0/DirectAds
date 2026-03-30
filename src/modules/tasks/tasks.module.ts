@@ -10,15 +10,10 @@ import { ListTasksUseCase } from './application/use-cases/list-tasks.use-case';
 import { UpdateTaskUseCase } from './application/use-cases/update-task.use-case';
 import { TASK_REPOSITORY } from './domain/interfaces/task-repository.interface';
 import { PrismaTaskRepository } from './infrastructure/repositories/prisma-task.repository';
+import { getJwtModuleOptions } from '../../config/auth/jwt.config';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET ?? 'directads-dev-secret',
-      signOptions: { expiresIn: '1h' },
-    }),
-  ],
+  imports: [PassportModule, JwtModule.register(getJwtModuleOptions())],
   controllers: [TasksController],
   providers: [
     {

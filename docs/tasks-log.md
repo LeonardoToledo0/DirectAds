@@ -149,3 +149,14 @@
 - Endpoints afetados: nenhum
 - Commit realizado: `1ed1d71` - `fix(backend): harden github actions workflow diagnostics`
 - Commit sugerido: `fix(backend): harden github actions workflow diagnostics`
+
+
+## TASK-BE-016 - Correcao da cobertura de branches no CI
+
+- Status: concluida
+- Objetivo: corrigir a quebra de `yarn test:cov` no GitHub Actions causada pela instrumentacao de branches em `JWT_SECRET` dentro dos modulos e da strategy
+- Arquivos principais: `src/config/auth/jwt.config.ts`, `src/config/auth/jwt.config.spec.ts`, `src/modules/auth/auth.module.ts`, `src/modules/auth/strategies/jwt.strategy.ts`, `src/modules/mfa/mfa.module.ts`, `src/modules/tasks/tasks.module.ts`, `docs/tasks-log.md`, `AGENTS.md`
+- Decisoes: extrair a resolucao de `JWT_SECRET` para um helper reutilizavel e testavel; cobrir explicitamente os cenarios com e sem variavel de ambiente; remover a branch dos decorators de modulo para manter a cobertura estavel entre Windows e Linux
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
+- Endpoints afetados: nenhum
+- Commit sugerido: `fix(backend): restore branch coverage parity in ci`
