@@ -1,36 +1,37 @@
 import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants';
 import { MfaModule } from './mfa.module';
-import { StartMicrosoftMfaUseCase } from './application/use-cases/start-microsoft-mfa.use-case';
-import { VerifyMicrosoftMfaUseCase } from './application/use-cases/verify-microsoft-mfa.use-case';
-import { MICROSOFT_MFA_PROVIDER } from './domain/interfaces/microsoft-mfa-provider.interface';
-import { MockMicrosoftMfaProvider } from './infrastructure/providers/mock-microsoft-mfa.provider';
-import { MicrosoftMfaController } from './presentation/controllers/microsoft-mfa.controller';
+import { EnableTotpMfaUseCase } from './application/use-cases/enable-totp-mfa.use-case';
+import { SetupTotpMfaUseCase } from './application/use-cases/setup-totp-mfa.use-case';
+import { VerifyTotpLoginUseCase } from './application/use-cases/verify-totp-login.use-case';
+import { TOTP_PROVIDER } from './domain/interfaces/totp-provider.interface';
+import { OtplibTotpProvider } from './infrastructure/providers/otplib-totp.provider';
+import { MfaController } from './presentation/controllers/mfa.controller';
 
 describe('MfaModule', () => {
-  it('registers the microsoft mfa controller', () => {
+  it('registers the mfa controller', () => {
     const controllers = Reflect.getMetadata(
       MODULE_METADATA.CONTROLLERS,
       MfaModule,
     ) as unknown[] | undefined;
 
-    expect(controllers).toEqual([MicrosoftMfaController]);
+    expect(controllers).toEqual([MfaController]);
   });
 
-  it('registers the microsoft provider and use cases', () => {
+  it('registers the TOTP provider and use cases', () => {
     const providers = Reflect.getMetadata(
       MODULE_METADATA.PROVIDERS,
       MfaModule,
     ) as unknown[] | undefined;
 
     expect(providers).toEqual([
-      expect.any(Function),
       {
-        provide: MICROSOFT_MFA_PROVIDER,
-        useClass: MockMicrosoftMfaProvider,
+        provide: TOTP_PROVIDER,
+        useClass: OtplibTotpProvider,
       },
-      StartMicrosoftMfaUseCase,
-      VerifyMicrosoftMfaUseCase,
+      SetupTotpMfaUseCase,
+      EnableTotpMfaUseCase,
+      VerifyTotpLoginUseCase,
     ]);
   });
 });

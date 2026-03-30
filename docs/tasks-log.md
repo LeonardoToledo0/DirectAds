@@ -63,21 +63,21 @@
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `feat(backend): implement full crud for main entity`
 
-## TASK-BE-008 - MFA Microsoft
+## TASK-BE-008 - MFA por TOTP com QR code
 
 - Status: concluida
-- Objetivo: adicionar fluxo Microsoft MFA desacoplado, com provider configuravel, state assinada, segunda etapa de verificacao e emissao de JWT local
-- Arquivos principais: `src/modules/mfa/`, `prisma/schema.prisma`, `prisma/migrations/20260330221500_add_microsoft_account_link/`, `.env.example`, `README.md`, `docs/api.md`, `docs/architecture.md`
-- Decisoes: usar um provider Microsoft mockado e configuravel por `.env` para manter o projeto executavel offline; vincular a identidade Microsoft em `User.microsoftAccountId`; criar automaticamente o usuario local quando a identidade Microsoft ainda nao existir; proteger o retorno do fluxo com `state` assinada em JWT e exigir `verificationCode` como segunda etapa MFA
-- Testes: `yarn db:generate`, `npx prisma migrate deploy`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
-- Commit sugerido: `feat(backend): add microsoft mfa authentication flow`
+- Objetivo: substituir o fluxo mockado anterior por MFA real de aplicacao com secret TOTP, QR code, ativacao por codigo de 6 digitos e segunda etapa de login
+- Arquivos principais: `src/modules/mfa/`, `src/modules/auth/`, `prisma/schema.prisma`, `prisma/migrations/`, `.env.example`, `README.md`, `docs/api.md`, `docs/architecture.md`
+- Decisoes: usar TOTP padrao compativel com Microsoft Authenticator e apps equivalentes; mover o MFA para o fluxo correto de cadastro/configuracao e login em duas etapas; gerar `qrCodeDataUrl` e `otpauthUrl` no backend; guardar `mfaSecret`, `mfaEnabled` e `mfaConfirmedAt` no usuario; emitir um `mfaToken` temporario no login antes da segunda etapa
+- Testes: `yarn db:generate`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
+- Commit sugerido: `feat(backend): implement totp mfa flow with qr code`
 
 ## TASK-BE-009 - Seed + dados de avaliacao
 
 - Status: concluida
 - Objetivo: criar seed idempotente com usuarios e tasks uteis para avaliacao e documentar sua execucao
 - Arquivos principais: `prisma/seed.ts`, `test/seed.integration-spec.ts`, `docs/setup.md`, `README.md`, `docs/tasks-log.md`
-- Decisoes: usar upsert para tornar a seed reproduzivel; popular tres usuarios de avaliacao com senha conhecida `secret123`; incluir um usuario ja vinculado ao fluxo Microsoft por `microsoftAccountId`; distribuir tasks com os tres status do dominio para facilitar demonstracao manual da API
+- Decisoes: usar upsert para tornar a seed reproduzivel; popular tres usuarios de avaliacao com senha conhecida `secret123`; manter o MFA desligado na seed para o avaliador poder executar o setup TOTP manualmente; distribuir tasks com os tres status do dominio para facilitar demonstracao manual da API
 - Testes: `yarn db:seed`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `chore(backend): add database seed for evaluation`
 
@@ -86,7 +86,7 @@
 - Status: concluida
 - Objetivo: revisar consistencia final da entrega, endurecer o ambiente Docker, padronizar scripts de validacao e alinhar a documentacao ao estado final do backend
 - Arquivos principais: `package.json`, `Dockerfile`, `docker-compose.yml`, `README.md`, `docs/setup.md`, `docs/architecture.md`, `docs/api.md`, `docs/tasks-log.md`
-- Decisoes: adicionar script `yarn quality:check` para consolidar os quality gates; adicionar `yarn db:migrate:deploy` para ambiente nao interativo; fazer o container do backend aplicar migrations antes do start; explicitar variaveis de auth e MFA no `docker-compose`; adicionar healthcheck do backend e encerrar a documentacao com o roadmap completo como concluido
+- Decisoes: adicionar script `yarn quality:check` para consolidar os quality gates; adicionar `yarn db:migrate:deploy` para ambiente nao interativo; fazer o container do backend aplicar migrations antes do start; explicitar as variaveis reais de JWT, banco e TOTP no `docker-compose`; adicionar healthcheck do backend e encerrar a documentacao com o roadmap completo como concluido
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`, `docker compose up --build -d backend`, `GET http://localhost:3000/api/health`, `GET http://localhost:3000/api/docs-json`
 - Commit sugerido: `chore(backend): finalize backend quality gates and delivery readiness`
 

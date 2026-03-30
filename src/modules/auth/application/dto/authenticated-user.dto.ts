@@ -11,6 +11,9 @@ export class AuthenticatedUserDto {
   @ApiProperty({ example: 'leona@example.com' })
   email!: string;
 
+  @ApiProperty({ example: false })
+  mfaEnabled!: boolean;
+
   @ApiProperty({ example: '2026-03-30T00:00:00.000Z' })
   createdAt!: Date;
 

@@ -12,6 +12,7 @@ import { CurrentUser } from '../../../../common/decorators/current-user.decorato
 import { AuthenticatedUserDto } from '../../application/dto/authenticated-user.dto';
 import { AuthResponseDto } from '../../application/dto/auth-response.dto';
 import { LoginDto } from '../../application/dto/login.dto';
+import { LoginResponseDto } from '../../application/dto/login-response.dto';
 import { RegisterDto } from '../../application/dto/register.dto';
 import { GetAuthenticatedUserUseCase } from '../../application/use-cases/get-authenticated-user.use-case';
 import { LoginUserUseCase } from '../../application/use-cases/login-user.use-case';
@@ -43,11 +44,11 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Autenticar um usuário existente' })
   @ApiOkResponse({
-    description: 'Usuário autenticado com sucesso',
-    type: AuthResponseDto,
+    description: 'Usuário autenticado ou redirecionado para a etapa MFA',
+    type: LoginResponseDto,
   })
   @ApiUnauthorizedResponse({ description: 'Credenciais inválidas' })
-  login(@Body() payload: LoginDto): Promise<AuthResponseDto> {
+  login(@Body() payload: LoginDto): Promise<LoginResponseDto> {
     return this.loginUserUseCase.execute(payload);
   }
 

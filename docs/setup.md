@@ -9,119 +9,106 @@
 
 ## 1. Instalar dependências
 
-```bash
+`ash
 yarn install
-```
+`
 
-## 2. Criar o arquivo `.env`
+## 2. Criar o arquivo .env
 
 Windows:
 
-```bash
+`ash
 copy .env.example .env
-```
+`
 
 Unix:
 
-```bash
+`ash
 cp .env.example .env
-```
+`
 
-Conteúdo esperado inicialmente:
+Conteúdo base:
 
-```env
+`env
 PORT=3000
 JWT_SECRET="directads-dev-secret"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
-MICROSOFT_CLIENT_ID="directads-local-client"
-MICROSOFT_TENANT_ID="common"
-MICROSOFT_REDIRECT_URI="http://localhost:3000/auth/microsoft/callback"
-MICROSOFT_MOCK_AUTH_CODE="mock-microsoft-auth-code"
-MICROSOFT_MOCK_VERIFICATION_CODE="123456"
-MICROSOFT_MOCK_USER_ID="microsoft-user-1"
-MICROSOFT_MOCK_USER_EMAIL="microsoft.user@example.com"
-MICROSOFT_MOCK_USER_NAME="Microsoft User"
-```
+TOTP_APP_NAME="DirectAds"
+`
 
 ## 3. Subir apenas o banco com Docker
 
-```bash
+`ash
 docker compose up -d postgres
-```
-
-Verificar status:
-
-```bash
-docker compose ps
-```
+`
 
 ## 4. Gerar o Prisma Client
 
-```bash
+`ash
 yarn db:generate
-```
+`
 
 ## 5. Aplicar as migrations
 
-Ambiente de desenvolvimento:
+Desenvolvimento:
 
-```bash
+`ash
 yarn db:migrate:dev
-```
+`
 
-Ambiente de avaliacao ou container:
+Ambiente não interativo:
 
-```bash
+`ash
 yarn db:migrate:deploy
-```
+`
 
 ## 6. Executar a seed
 
-```bash
+`ash
 yarn db:seed
-```
+`
 
 Dados de avaliação criados pela seed:
 
-- usuário `Leona Silva` com email `leona@example.com` e senha `secret123`
-- usuário `Mario Souza` com email `mario@example.com` e senha `secret123`
-- usuário `Microsoft User` com email `microsoft.user@example.com`, senha `secret123` e vínculo `microsoftAccountId=microsoft-user-1`
-- tasks distribuídas entre os três usuários com status `TODO`, `IN_PROGRESS` e `DONE`
+- usuário Leona Silva com email leona@example.com e senha secret123
+- usuário Mario Souza com email mario@example.com e senha secret123
+- usuário Carla Mendes com email carla@example.com e senha secret123
+- tasks distribuídas entre os três usuários com status TODO, IN_PROGRESS e DONE
 
 ## 7. Rodar a aplicação localmente
 
-```bash
+`ash
 yarn start:dev
-```
+`
 
-API esperada:
+URLs úteis:
 
-- `http://localhost:3000`
-
-Healthcheck:
-
-- `http://localhost:3000/api/health`
-
-Swagger:
-
-- `http://localhost:3000/api/docs`
+- API em http://localhost:3000
+- healthcheck em http://localhost:3000/api/health
+- Swagger em http://localhost:3000/api/docs
 
 ## 8. Rodar tudo com Docker
 
-```bash
+`ash
 docker compose up --build
-```
+`
 
-O backend em container executa `yarn db:migrate:deploy` antes de iniciar a API.
+O backend em container executa yarn db:migrate:deploy antes de iniciar a API.
 
-Serviços expostos:
+## 9. Configurar MFA por TOTP
 
-- backend em `http://localhost:3000`
-- postgres em `localhost:5432`
+Fluxo esperado:
 
-## 9. Rodar validações
+1. registre ou faça login com email e senha
+2. chame POST /api/mfa/setup autenticado com JWT
+3. escaneie o qrCodeDataUrl no Microsoft Authenticator ou app equivalente
+4. gere um código de 6 dígitos no app
+5. chame POST /api/mfa/enable com esse código
+6. nos próximos logins, use POST /api/auth/login e depois POST /api/mfa/verify-login
 
-```bash
+## 10. Rodar validações
+
+`ash
 yarn lint
 yarn type-check
 yarn build
@@ -130,40 +117,29 @@ yarn test:integration
 yarn test:cov
 yarn test:e2e
 yarn quality:check
-```
+`
 
 ## Comandos úteis
 
 Parar containers:
 
-```bash
+`ash
 docker compose down
-```
+`
 
 Parar containers e remover volumes:
 
-```bash
+`ash
 docker compose down -v
-```
+`
 
 Rebuild completo:
 
-```bash
+`ash
 docker compose up --build
-```
+`
 
 ## Problemas comuns
-
-### Docker Desktop desligado
-
-Sintoma:
-
-- falha ao subir `docker compose`
-
-Ação:
-
-- iniciar o Docker Desktop
-- repetir o comando
 
 ### Banco sem migration aplicada
 
@@ -173,15 +149,15 @@ Sintoma:
 
 Ação:
 
-```bash
+`ash
 yarn db:migrate:dev
-```
+`
 
-Ou, em contexto não interativo:
+Ou, em ambiente não interativo:
 
-```bash
+`ash
 yarn db:migrate:deploy
-```
+`
 
 ### Prisma Client inconsistente
 
@@ -191,19 +167,30 @@ Sintoma:
 
 Ação:
 
-```bash
+`ash
 yarn db:generate
-```
+`
 
-### Seed sem dados esperados
+### Login passou a exigir token MFA
 
 Sintoma:
 
-- usuários e tasks de avaliação não aparecem no banco
+- POST /api/auth/login responde com mfaRequired=true
 
 Ação:
 
-```bash
-yarn db:seed
-```
+- use o mfaToken retornado no body
+- abra o Microsoft Authenticator
+- envie o código atual em POST /api/mfa/verify-login
 
+### QR code não foi lido
+
+Sintoma:
+
+- o app autenticador não reconhece o QR code
+
+Ação:
+
+- verifique se TOTP_APP_NAME está preenchido
+- gere o setup novamente em POST /api/mfa/setup
+- use o otpauthUrl como alternativa para importação manual

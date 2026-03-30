@@ -11,6 +11,7 @@ describe('GetAuthenticatedUserUseCase', () => {
           name: 'Leona',
           email: 'leona@example.com',
           passwordHash: 'hashed',
+          mfaEnabled: true,
           createdAt: new Date('2026-03-30T00:00:00.000Z'),
           updatedAt: new Date('2026-03-30T00:00:00.000Z'),
         }),
@@ -22,6 +23,7 @@ describe('GetAuthenticatedUserUseCase', () => {
       id: 'user-1',
       name: 'Leona',
       email: 'leona@example.com',
+      mfaEnabled: true,
       createdAt: new Date('2026-03-30T00:00:00.000Z'),
       updatedAt: new Date('2026-03-30T00:00:00.000Z'),
     });

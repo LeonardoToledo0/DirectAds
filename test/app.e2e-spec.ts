@@ -65,8 +65,9 @@ describe('Health endpoint (e2e)', () => {
     expect(body.paths['/api/auth/me']).toBeDefined();
     expect(body.paths['/api/tasks']).toBeDefined();
     expect(body.paths['/api/tasks/{taskId}']).toBeDefined();
-    expect(body.paths['/api/mfa/microsoft/start']).toBeDefined();
-    expect(body.paths['/api/mfa/microsoft/verify']).toBeDefined();
+    expect(body.paths['/api/mfa/setup']).toBeDefined();
+    expect(body.paths['/api/mfa/enable']).toBeDefined();
+    expect(body.paths['/api/mfa/verify-login']).toBeDefined();
     expect(body.components?.securitySchemes?.bearer).toBeDefined();
   });
 });

@@ -46,6 +46,7 @@ export class RegisterUserUseCase {
         id: user.id,
         name: user.name,
         email: user.email,
+        mfaEnabled: user.mfaEnabled,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },

@@ -4,15 +4,16 @@ Backend em NestJS para a aplicacao DirectAds.
 
 ## Visao geral
 
-O projeto esta sendo construido com foco em:
+O projeto esta sendo construído com foco em:
 
 - arquitetura modular
 - tipagem forte
 - infraestrutura reproduzivel
 - autenticacao segura com JWT
+- MFA por TOTP com QR code
 - documentacao tecnica e operacional clara
 
-No estado atual, o backend ja possui:
+No estado atual, o backend possui:
 
 - NestJS com TypeScript
 - PostgreSQL via Docker
@@ -21,11 +22,10 @@ No estado atual, o backend ja possui:
 - healthcheck
 - autenticacao JWT com registro, login e rota protegida
 - Swagger em `/api/docs`
-- entidade principal `Task` modelada com ownership por usuario
+- entidade principal `Task` com ownership por usuario
 - CRUD HTTP completo de `tasks` com filtro por status
-- fluxo Microsoft MFA desacoplado e testavel com provider mockado
-- scripts de validacao e deploy local do banco prontos para avaliacao
-- lint, build e testes automatizados
+- MFA por TOTP compativel com Microsoft Authenticator, Google Authenticator e apps equivalentes
+- scripts de validacao e quality gates
 - Husky, lint-staged e commitlint
 
 ## Stack utilizada
@@ -42,6 +42,8 @@ No estado atual, o backend ja possui:
 - Jest
 - ESLint
 - Prettier
+- `otplib`
+- `qrcode`
 
 ## Arquitetura adotada
 
@@ -52,7 +54,7 @@ O projeto segue uma organizacao modular inspirada em Clean Architecture, separan
 - `presentation`
 - `infrastructure`
 
-Modulos implementados ate aqui:
+Modulos implementados:
 
 - `health`
 - `prisma`
@@ -137,7 +139,7 @@ yarn start:dev
 docker compose up --build
 ```
 
-O backend em container agora aplica `yarn db:migrate:deploy` antes de subir a aplicacao.
+O backend em container aplica `yarn db:migrate:deploy` antes de subir a aplicacao.
 
 Servicos expostos:
 
@@ -152,21 +154,14 @@ Arquivo base: [`.env.example`](e:/directads/.env.example)
 PORT=3000
 JWT_SECRET="directads-dev-secret"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
-MICROSOFT_CLIENT_ID="directads-local-client"
-MICROSOFT_TENANT_ID="common"
-MICROSOFT_REDIRECT_URI="http://localhost:3000/auth/microsoft/callback"
-MICROSOFT_MOCK_AUTH_CODE="mock-microsoft-auth-code"
-MICROSOFT_MOCK_VERIFICATION_CODE="123456"
-MICROSOFT_MOCK_USER_ID="microsoft-user-1"
-MICROSOFT_MOCK_USER_EMAIL="microsoft.user@example.com"
-MICROSOFT_MOCK_USER_NAME="Microsoft User"
+TOTP_APP_NAME="DirectAds"
 ```
 
 ## Banco de dados
 
 - PostgreSQL como banco principal
 - Prisma como ORM
-- entidade `User` com `email` unico, `passwordHash` e vinculo opcional `microsoftAccountId`
+- entidade `User` com `email` unico, `passwordHash`, `mfaSecret`, `mfaEnabled` e `mfaConfirmedAt`
 - entidade `Task` vinculada a `User` por `userId`
 - enum `TaskStatus` com `TODO`, `IN_PROGRESS` e `DONE`
 
@@ -217,7 +212,7 @@ yarn test:e2e
 yarn quality:check
 ```
 
-## API disponivel neste momento
+## API disponivel
 
 ### Healthcheck
 
@@ -229,9 +224,28 @@ yarn quality:check
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 
-O endpoint `GET /api/auth/me` exige:
+`GET /api/auth/me` exige:
 
 - `Authorization: Bearer <token>`
+
+### MFA por TOTP
+
+Rotas disponiveis:
+
+- `POST /api/mfa/setup`
+- `POST /api/mfa/enable`
+- `POST /api/mfa/verify-login`
+
+Fluxo implementado:
+
+1. o usuario se registra ou faz login com email e senha
+2. autenticado com JWT, chama `POST /api/mfa/setup`
+3. o backend devolve `secret`, `otpauthUrl` e `qrCodeDataUrl`
+4. o usuario escaneia o QR code no Microsoft Authenticator ou app equivalente
+5. o usuario confirma o primeiro codigo em `POST /api/mfa/enable`
+6. nos proximos logins, `POST /api/auth/login` retorna `mfaRequired=true` e `mfaToken`
+7. o usuario envia o codigo atual para `POST /api/mfa/verify-login`
+8. o backend valida o TOTP e so entao emite o JWT final
 
 ### Tasks
 
@@ -253,20 +267,6 @@ A listagem aceita filtro opcional por status:
 - `GET /api/tasks?status=IN_PROGRESS`
 - `GET /api/tasks?status=DONE`
 
-### Microsoft MFA
-
-Rotas disponiveis:
-
-- `POST /api/mfa/microsoft/start`
-- `POST /api/mfa/microsoft/verify`
-
-Fluxo implementado:
-
-- o backend gera uma `authorizationUrl` Microsoft e um `state` assinado
-- o client simula ou recebe o `code` devolvido pelo provider Microsoft
-- o backend valida `state`, troca o `code` pela identidade Microsoft e exige um `verificationCode` de segunda etapa
-- apos a verificacao, o backend localiza, vincula ou cria o usuario local e emite o JWT da API
-
 Documentacao detalhada da API: [api.md](e:/directads/docs/api.md)
 
 ## Swagger
@@ -281,57 +281,53 @@ Documento OpenAPI em JSON:
 
 Como usar bearer token no Swagger:
 
-- autentique em `POST /api/auth/login`, `POST /api/auth/register` ou conclua o fluxo `POST /api/mfa/microsoft/verify`
+- autentique em `POST /api/auth/register` ou `POST /api/auth/login`
+- se o login responder com `mfaRequired=true`, conclua a segunda etapa em `POST /api/mfa/verify-login`
 - copie o `accessToken`
 - clique em `Authorize` no Swagger
 - informe `Bearer <token>`
-- use o mesmo token nas rotas de `tasks`
+- use o mesmo token nas rotas protegidas
 
-## JWT
+## JWT e MFA
 
 Fluxos implementados:
 
 - registro com hash de senha
 - login com comparacao segura de senha
-- emissao de token JWT
+- emissao de JWT
 - rota protegida para usuario autenticado
-- CRUD protegido do dominio principal
-- emissao de JWT local apos fluxo Microsoft MFA validado
+- setup de MFA por QR code
+- ativacao do MFA por confirmacao de codigo TOTP
+- login em duas etapas quando `mfaEnabled=true`
 
-Payload atual do token:
+Payload atual do token final:
 
 - `sub`
 - `email`
-
-## MFA Microsoft
-
-O projeto ja possui um fluxo Microsoft MFA desacoplado para uso local e testes automatizados.
-
-Comportamento atual:
-
-- provider mockado e configuravel por variaveis de ambiente
-- URL federada Microsoft gerada no endpoint de inicio
-- state assinada com JWT para proteger o retorno do fluxo
-- validacao de segunda etapa via `verificationCode`
-- vinculacao da identidade Microsoft em `User.microsoftAccountId`
-- criacao automatica do usuario local quando necessario
-
-Valores mock padrao para ambiente local:
-
-- `MICROSOFT_MOCK_AUTH_CODE=mock-microsoft-auth-code`
-- `MICROSOFT_MOCK_VERIFICATION_CODE=123456`
 
 ## Dependencias e justificativas
 
 - `@nestjs/*`: base do framework HTTP
 - `@prisma/client` e `prisma`: ORM, client tipado e migrations
-- `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`: autenticacao JWT e assinatura de state do fluxo Microsoft
+- `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`: autenticacao JWT
 - `bcryptjs`: hash e verificacao de senha
 - `@nestjs/swagger` e `swagger-ui-express`: documentacao OpenAPI e UI interativa
 - `class-validator` e `class-transformer`: validacao de DTOs
+- `otplib`: geracao e validacao de codigos TOTP
+- `qrcode`: geracao do QR code em data URL
 - `jest` e `supertest`: testes automatizados
 - `eslint` e `prettier`: qualidade estatica
 - `husky`, `lint-staged` e `commitlint`: padrao de desenvolvimento
+
+## Dados de avaliacao
+
+Depois de `yarn db:seed`:
+
+- `leona@example.com / secret123`
+- `mario@example.com / secret123`
+- `carla@example.com / secret123`
+
+O MFA vem desligado na seed para o avaliador poder testar o setup do QR code manualmente.
 
 ## Estado atual do roadmap
 
@@ -342,7 +338,7 @@ Valores mock padrao para ambiente local:
 - concluido: Swagger
 - concluido: modelagem da entidade principal e contratos de repositorio
 - concluido: CRUD principal via HTTP
-- concluido: MFA Microsoft
+- concluido: MFA por TOTP
 - concluido: seed final de avaliacao
 - concluido: fortalecimento final de qualidade
 
@@ -373,13 +369,21 @@ Verifique:
 yarn db:generate
 ```
 
-### Fluxo Microsoft MFA recusando o mock
+### O login esta pedindo token MFA
 
 Verifique:
 
-- se `MICROSOFT_MOCK_AUTH_CODE` bate com o `code` enviado para `/api/mfa/microsoft/verify`
-- se `MICROSOFT_MOCK_VERIFICATION_CODE` bate com o `verificationCode`
-- se o `state` usado no verify veio do endpoint `/api/mfa/microsoft/start`
+- se o usuario ja ativou o MFA em `POST /api/mfa/enable`
+- se o `mfaToken` retornado por `POST /api/auth/login` esta sendo reutilizado em `POST /api/mfa/verify-login`
+- se o codigo de 6 digitos veio do app autenticador certo
+
+### O QR code nao foi aceito
+
+Verifique:
+
+- se `TOTP_APP_NAME` esta configurado
+- se o setup foi gerado novamente em `POST /api/mfa/setup`
+- se necessario, use o `otpauthUrl` para cadastro manual no app
 
 ## Documentacao complementar
 
@@ -387,4 +391,3 @@ Verifique:
 - [setup.md](e:/directads/docs/setup.md)
 - [api.md](e:/directads/docs/api.md)
 - [tasks-log.md](e:/directads/docs/tasks-log.md)
-

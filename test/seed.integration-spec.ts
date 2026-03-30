@@ -27,11 +27,11 @@ describe('Seed integration', () => {
       where: { email: string };
       update: { name: string; passwordHash: string };
     };
-    const microsoftUserCall = userUpsert.mock.calls[2][0] as {
+    const thirdUserCall = userUpsert.mock.calls[2][0] as {
       where: { email: string };
-      create: { microsoftAccountId?: string };
+      create: { mfaEnabled: boolean; mfaSecret: null; mfaConfirmedAt: null };
     };
-    const microsoftTaskCall = taskUpsert.mock.calls[5][0] as {
+    const thirdTaskCall = taskUpsert.mock.calls[5][0] as {
       where: { id: string };
       create: { status: TaskStatus; userId: string };
     };
@@ -39,13 +39,13 @@ describe('Seed integration', () => {
     expect(firstUserCall.where.email).toBe('leona@example.com');
     expect(firstUserCall.update.name).toBe('Leona Silva');
     expect(firstUserCall.update.passwordHash).toBe('hashed-password');
-    expect(microsoftUserCall.where.email).toBe('microsoft.user@example.com');
-    expect(microsoftUserCall.create.microsoftAccountId).toBe(
-      'microsoft-user-1',
-    );
-    expect(microsoftTaskCall.where.id).toBe('seed-task-microsoft-2');
-    expect(microsoftTaskCall.create.status).toBe(TaskStatus.IN_PROGRESS);
-    expect(microsoftTaskCall.create.userId).toBe('seed-user-microsoft');
+    expect(thirdUserCall.where.email).toBe('carla@example.com');
+    expect(thirdUserCall.create.mfaEnabled).toBe(false);
+    expect(thirdUserCall.create.mfaSecret).toBeNull();
+    expect(thirdUserCall.create.mfaConfirmedAt).toBeNull();
+    expect(thirdTaskCall.where.id).toBe('seed-task-carla-2');
+    expect(thirdTaskCall.create.status).toBe(TaskStatus.IN_PROGRESS);
+    expect(thirdTaskCall.create.userId).toBe('seed-user-carla');
 
     hashSpy.mockRestore();
   });

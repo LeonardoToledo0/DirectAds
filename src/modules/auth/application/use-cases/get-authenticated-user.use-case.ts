@@ -21,6 +21,7 @@ export class GetAuthenticatedUserUseCase {
       id: user.id,
       email: user.email,
       name: user.name,
+      mfaEnabled: user.mfaEnabled,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

@@ -13,6 +13,21 @@ interface AuthResponseBody {
     id: string;
     name: string;
     email: string;
+    mfaEnabled: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
+interface LoginResponseBody {
+  mfaRequired: boolean;
+  accessToken?: string;
+  mfaToken?: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    mfaEnabled: boolean;
     createdAt: string;
     updatedAt: string;
   };
@@ -22,6 +37,7 @@ interface MeResponseBody {
   id: string;
   name: string;
   email: string;
+  mfaEnabled: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,6 +50,9 @@ describe('Auth endpoints (e2e)', () => {
     name: string;
     email: string;
     passwordHash: string;
+    mfaSecret: string | null;
+    mfaEnabled: boolean;
+    mfaConfirmedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
   }>;
@@ -75,6 +94,9 @@ describe('Auth endpoints (e2e)', () => {
                 name: data.name,
                 email: data.email,
                 passwordHash: data.passwordHash,
+                mfaSecret: null,
+                mfaEnabled: false,
+                mfaConfirmedAt: null,
                 createdAt: new Date('2026-03-30T00:00:00.000Z'),
                 updatedAt: new Date('2026-03-30T00:00:00.000Z'),
               };
@@ -82,6 +104,40 @@ describe('Auth endpoints (e2e)', () => {
               return user;
             },
           ),
+        update: jest.fn().mockImplementation(
+          ({
+            where,
+            data,
+          }: {
+            where: { id: string };
+            data: {
+              mfaSecret?: string | null;
+              mfaEnabled?: boolean;
+              mfaConfirmedAt?: Date | null;
+            };
+          }) => {
+            const index = users.findIndex((user) => user.id === where.id);
+            const currentUser = users[index];
+            const updatedUser = {
+              ...currentUser,
+              mfaSecret:
+                data.mfaSecret === undefined
+                  ? currentUser.mfaSecret
+                  : data.mfaSecret,
+              mfaEnabled:
+                data.mfaEnabled === undefined
+                  ? currentUser.mfaEnabled
+                  : data.mfaEnabled,
+              mfaConfirmedAt:
+                data.mfaConfirmedAt === undefined
+                  ? currentUser.mfaConfirmedAt
+                  : data.mfaConfirmedAt,
+              updatedAt: new Date('2026-03-30T01:00:00.000Z'),
+            };
+            users[index] = updatedUser;
+            return updatedUser;
+          },
+        ),
       },
     } as unknown as PrismaService;
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -105,7 +161,7 @@ describe('Auth endpoints (e2e)', () => {
     await app.close();
   });
 
-  it('registers, logs in, and returns the authenticated user', async () => {
+  it('registers, logs in without MFA, and returns the authenticated user', async () => {
     const server = app.getHttpServer() as Parameters<typeof request>[0];
     const registerResponse = await request(server)
       .post('/api/auth/register')
@@ -118,15 +174,17 @@ describe('Auth endpoints (e2e)', () => {
 
     expect(registerResponse.status).toBe(201);
     expect(registerBody.user.email).toBe('leona@example.com');
+    expect(registerBody.user.mfaEnabled).toBe(false);
     expect(registerBody.accessToken).toEqual(expect.any(String));
 
     const loginResponse = await request(server).post('/api/auth/login').send({
       email: 'leona@example.com',
       password: 'secret123',
     });
-    const loginBody = loginResponse.body as AuthResponseBody;
+    const loginBody = loginResponse.body as LoginResponseBody;
 
     expect(loginResponse.status).toBe(201);
+    expect(loginBody.mfaRequired).toBe(false);
     expect(loginBody.accessToken).toEqual(expect.any(String));
 
     const meResponse = await request(server)
@@ -136,6 +194,7 @@ describe('Auth endpoints (e2e)', () => {
 
     expect(meResponse.status).toBe(200);
     expect(meBody.email).toBe('leona@example.com');
+    expect(meBody.mfaEnabled).toBe(false);
     expect(
       await passwordService.comparePassword('secret123', users[0].passwordHash),
     ).toBe(true);

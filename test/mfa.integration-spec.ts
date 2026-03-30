@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
-import { MicrosoftMfaController } from '../src/modules/mfa/presentation/controllers/microsoft-mfa.controller';
-import { StartMicrosoftMfaUseCase } from '../src/modules/mfa/application/use-cases/start-microsoft-mfa.use-case';
-import { VerifyMicrosoftMfaUseCase } from '../src/modules/mfa/application/use-cases/verify-microsoft-mfa.use-case';
+import { MfaController } from '../src/modules/mfa/presentation/controllers/mfa.controller';
+import { EnableTotpMfaUseCase } from '../src/modules/mfa/application/use-cases/enable-totp-mfa.use-case';
+import { SetupTotpMfaUseCase } from '../src/modules/mfa/application/use-cases/setup-totp-mfa.use-case';
+import { VerifyTotpLoginUseCase } from '../src/modules/mfa/application/use-cases/verify-totp-login.use-case';
 
 describe('Mfa module integration', () => {
   let moduleRef: TestingModule;
@@ -13,9 +14,10 @@ describe('Mfa module integration', () => {
     }).compile();
   });
 
-  it('wires the microsoft mfa controller and use cases through the module graph', () => {
-    expect(moduleRef.get(MicrosoftMfaController)).toBeDefined();
-    expect(moduleRef.get(StartMicrosoftMfaUseCase)).toBeDefined();
-    expect(moduleRef.get(VerifyMicrosoftMfaUseCase)).toBeDefined();
+  it('wires the TOTP mfa controller and use cases through the module graph', () => {
+    expect(moduleRef.get(MfaController)).toBeDefined();
+    expect(moduleRef.get(SetupTotpMfaUseCase)).toBeDefined();
+    expect(moduleRef.get(EnableTotpMfaUseCase)).toBeDefined();
+    expect(moduleRef.get(VerifyTotpLoginUseCase)).toBeDefined();
   });
 });

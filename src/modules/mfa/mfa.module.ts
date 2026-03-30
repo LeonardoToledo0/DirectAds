@@ -1,31 +1,29 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { PasswordService } from '../auth/application/services/password.service';
-import { MicrosoftMfaController } from './presentation/controllers/microsoft-mfa.controller';
-import { StartMicrosoftMfaUseCase } from './application/use-cases/start-microsoft-mfa.use-case';
-import { VerifyMicrosoftMfaUseCase } from './application/use-cases/verify-microsoft-mfa.use-case';
-import { MICROSOFT_MFA_PROVIDER } from './domain/interfaces/microsoft-mfa-provider.interface';
-import { MockMicrosoftMfaProvider } from './infrastructure/providers/mock-microsoft-mfa.provider';
+import { MfaController } from './presentation/controllers/mfa.controller';
+import { EnableTotpMfaUseCase } from './application/use-cases/enable-totp-mfa.use-case';
+import { SetupTotpMfaUseCase } from './application/use-cases/setup-totp-mfa.use-case';
+import { VerifyTotpLoginUseCase } from './application/use-cases/verify-totp-login.use-case';
+import { TOTP_PROVIDER } from './domain/interfaces/totp-provider.interface';
+import { OtplibTotpProvider } from './infrastructure/providers/otplib-totp.provider';
 
 @Module({
   imports: [
-    PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET ?? 'directads-dev-secret',
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  controllers: [MicrosoftMfaController],
+  controllers: [MfaController],
   providers: [
-    PasswordService,
     {
-      provide: MICROSOFT_MFA_PROVIDER,
-      useClass: MockMicrosoftMfaProvider,
+      provide: TOTP_PROVIDER,
+      useClass: OtplibTotpProvider,
     },
-    StartMicrosoftMfaUseCase,
-    VerifyMicrosoftMfaUseCase,
+    SetupTotpMfaUseCase,
+    EnableTotpMfaUseCase,
+    VerifyTotpLoginUseCase,
   ],
-  exports: [StartMicrosoftMfaUseCase, VerifyMicrosoftMfaUseCase],
+  exports: [SetupTotpMfaUseCase, EnableTotpMfaUseCase, VerifyTotpLoginUseCase],
 })
 export class MfaModule {}

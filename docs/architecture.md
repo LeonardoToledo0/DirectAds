@@ -6,9 +6,7 @@ Documentar a base arquitetural do backend DirectAds no estado atual do projeto.
 
 ## Direção arquitetural
 
-O backend está sendo estruturado com uma organização modular inspirada em Clean Architecture.
-
-O objetivo é manter:
+O backend segue uma organização modular inspirada em Clean Architecture para manter:
 
 - regra de negócio fora de controllers
 - infraestrutura isolada
@@ -26,13 +24,14 @@ Responsável por:
 - expor endpoints
 - delegar execução para casos de uso
 - serializar respostas
+- documentar contratos no Swagger
 
 No estado atual:
 
 - [health.controller.ts](e:/directads/src/modules/health/presentation/controllers/health.controller.ts)
 - [auth.controller.ts](e:/directads/src/modules/auth/presentation/controllers/auth.controller.ts)
 - [tasks.controller.ts](e:/directads/src/modules/tasks/presentation/controllers/tasks.controller.ts)
-- [microsoft-mfa.controller.ts](e:/directads/src/modules/mfa/presentation/controllers/microsoft-mfa.controller.ts)
+- [mfa.controller.ts](e:/directads/src/modules/mfa/presentation/controllers/mfa.controller.ts)
 
 ### Application
 
@@ -53,8 +52,9 @@ No estado atual:
 - [get-task-by-id.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/get-task-by-id.use-case.ts)
 - [update-task.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/update-task.use-case.ts)
 - [delete-task.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/delete-task.use-case.ts)
-- [start-microsoft-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/start-microsoft-mfa.use-case.ts)
-- [verify-microsoft-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/verify-microsoft-mfa.use-case.ts)
+- [setup-totp-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/setup-totp-mfa.use-case.ts)
+- [enable-totp-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/enable-totp-mfa.use-case.ts)
+- [verify-totp-login.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/verify-totp-login.use-case.ts)
 
 ### Domain
 
@@ -70,7 +70,7 @@ No estado atual:
 - [authenticated-user.interface.ts](e:/directads/src/modules/auth/domain/interfaces/authenticated-user.interface.ts)
 - [task.entity.ts](e:/directads/src/modules/tasks/domain/entities/task.entity.ts)
 - [task-repository.interface.ts](e:/directads/src/modules/tasks/domain/interfaces/task-repository.interface.ts)
-- [microsoft-mfa-provider.interface.ts](e:/directads/src/modules/mfa/domain/interfaces/microsoft-mfa-provider.interface.ts)
+- [totp-provider.interface.ts](e:/directads/src/modules/mfa/domain/interfaces/totp-provider.interface.ts)
 
 ### Infrastructure
 
@@ -85,40 +85,26 @@ No estado atual:
 - [prisma.service.ts](e:/directads/src/prisma/prisma.service.ts)
 - [prisma.module.ts](e:/directads/src/prisma/prisma.module.ts)
 - [prisma-task.repository.ts](e:/directads/src/modules/tasks/infrastructure/repositories/prisma-task.repository.ts)
-- [mock-microsoft-mfa.provider.ts](e:/directads/src/modules/mfa/infrastructure/providers/mock-microsoft-mfa.provider.ts)
+- [otplib-totp.provider.ts](e:/directads/src/modules/mfa/infrastructure/providers/otplib-totp.provider.ts)
 
 ## Organização de módulos
 
-O projeto está estruturado para crescer por domínio.
-
 Hoje os módulos implementados são:
 
-- `health`
-- `prisma`
-- `auth`
-- `tasks`
-- `mfa`
-
-### Módulo health
-
-Função:
-
-- validar que a aplicação sobe corretamente
-- servir como primeiro fluxo funcional
-
-### Módulo prisma
-
-Função:
-
-- centralizar o acesso ao Prisma Client
-- expor a dependência de banco de forma global
+- health
+- prisma
+- uth
+- 	asks
+- mfa
 
 ### Módulo auth
 
 Função:
 
-- registrar e autenticar usuários
-- proteger rotas privadas com JWT
+- registrar usuários
+- autenticar por email e senha
+- emitir JWT
+- retornar um token temporário de segunda etapa quando o MFA estiver habilitado
 - expor o usuário autenticado
 
 ### Módulo tasks
@@ -133,10 +119,10 @@ Função:
 
 Função:
 
-- iniciar o fluxo federado Microsoft
-- validar o retorno do provider e a segunda etapa MFA
-- vincular a identidade Microsoft ao usuário local
-- emitir o JWT local após a autenticação complementar
+- gerar secret TOTP por usuário autenticado
+- devolver QR code e otpauthUrl para cadastro no app autenticador
+- confirmar o primeiro código TOTP e ativar MFA
+- concluir o login em segunda etapa quando mfaEnabled=true
 
 ## Bootstrap da aplicação
 
@@ -146,10 +132,10 @@ Arquivo principal:
 
 Configurações atuais:
 
-- prefixo global `/api`
-- `ValidationPipe` global
+- prefixo global /api
+- ValidationPipe global
 - integração do ciclo de vida com Prisma
-- Swagger em `/api/docs`
+- Swagger em /api/docs
 
 ## Banco de dados
 
@@ -159,13 +145,13 @@ Arquivo principal do schema:
 
 Modelagem atual:
 
-- tabela `users`
-- tabela `tasks`
+- tabela users
+- tabela 	asks
 - UUID como identificador
-- `email` com unicidade
-- `User.microsoftAccountId` para vincular a identidade Microsoft
-- `Task.userId` como ownership explícito
-- enum `TaskStatus` para o ciclo principal da entidade
+- email com unicidade
+- User.mfaSecret, User.mfaEnabled e User.mfaConfirmedAt para o fluxo TOTP
+- Task.userId como ownership explícito
+- enum TaskStatus para o ciclo principal da entidade
 - timestamps de criação e atualização
 
 ## Decisões arquiteturais já tomadas
@@ -176,8 +162,8 @@ Modelagem atual:
 - a documentação acompanha a evolução por task
 - o CRUD principal aplica ownership no caso de uso e no acesso ao repositório
 - o contrato HTTP do domínio principal é documentado diretamente no Swagger do módulo
-- o fluxo Microsoft MFA usa provider desacoplado para permitir troca futura pelo SDK real sem afetar os casos de uso
-- o ambiente local usa provider mockado e reproduzível para manter os testes automatizados estáveis
+- o MFA usa TOTP compatível com Microsoft Authenticator, mantendo o backend independente de login federado externo
+- a segunda etapa de login usa um mfaToken temporário assinado para evitar emissão prematura do JWT final
 - o container do backend aplica migrations automaticamente na inicialização para reduzir atrito na avaliação
 
 ## Estado final da arquitetura
@@ -185,6 +171,6 @@ Modelagem atual:
 - módulos principais implementados e documentados
 - autenticação JWT pronta para uso
 - domínio principal com CRUD completo e ownership
-- fluxo Microsoft MFA funcional para ambiente local e testes
+- MFA por TOTP com QR code funcional
 - seed de avaliação reproduzível
 - quality gates automatizados e validados

@@ -9,7 +9,7 @@ interface SeedUserInput {
   name: string;
   email: string;
   password: string;
-  microsoftAccountId?: string;
+  mfaEnabled?: boolean;
   tasks: Array<{
     id: string;
     title: string;
@@ -60,22 +60,22 @@ const seedUsers: SeedUserInput[] = [
     ],
   },
   {
-    id: 'seed-user-microsoft',
-    name: 'Microsoft User',
-    email: 'microsoft.user@example.com',
+    id: 'seed-user-carla',
+    name: 'Carla Mendes',
+    email: 'carla@example.com',
     password: 'secret123',
-    microsoftAccountId: 'microsoft-user-1',
+    mfaEnabled: false,
     tasks: [
       {
-        id: 'seed-task-microsoft-1',
-        title: 'Validar fluxo Microsoft MFA',
-        description: 'Confirmar state, code mockado e segunda etapa MFA.',
+        id: 'seed-task-carla-1',
+        title: 'Configurar MFA por TOTP',
+        description: 'Escanear o QR code no app autenticador e confirmar o primeiro codigo.',
         status: TaskStatus.DONE,
       },
       {
-        id: 'seed-task-microsoft-2',
-        title: 'Conferir vinculacao da conta Microsoft',
-        description: 'Garantir que microsoftAccountId esteja persistido no usuario.',
+        id: 'seed-task-carla-2',
+        title: 'Validar login em duas etapas',
+        description: 'Garantir que o login solicite o token TOTP quando o MFA estiver habilitado.',
         status: TaskStatus.IN_PROGRESS,
       },
     ],
@@ -91,14 +91,18 @@ export async function runSeed(client: PrismaClient): Promise<void> {
       update: {
         name: userInput.name,
         passwordHash,
-        microsoftAccountId: userInput.microsoftAccountId,
+        mfaSecret: null,
+        mfaEnabled: userInput.mfaEnabled ?? false,
+        mfaConfirmedAt: null,
       },
       create: {
         id: userInput.id,
         name: userInput.name,
         email: userInput.email,
         passwordHash,
-        microsoftAccountId: userInput.microsoftAccountId,
+        mfaSecret: null,
+        mfaEnabled: userInput.mfaEnabled ?? false,
+        mfaConfirmedAt: null,
       },
     });
 
@@ -127,11 +131,13 @@ async function main() {
   await runSeed(prisma);
 }
 
-main()
-  .catch((error: unknown) => {
-    console.error('Prisma seed failed', error);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+if (require.main === module) {
+  void main()
+    .catch((error: unknown) => {
+      console.error('Prisma seed failed', error);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}
