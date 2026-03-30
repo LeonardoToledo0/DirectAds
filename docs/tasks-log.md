@@ -159,4 +159,5 @@
 - Decisoes: extrair a resolucao de `JWT_SECRET` para um helper reutilizavel e testavel; cobrir explicitamente os cenarios com e sem variavel de ambiente; remover a branch dos decorators de modulo para manter a cobertura estavel entre Windows e Linux
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
 - Endpoints afetados: nenhum
+- Commit realizado: `0125b9f` - `fix(backend): restore branch coverage parity in ci`
 - Commit sugerido: `fix(backend): restore branch coverage parity in ci`
