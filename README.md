@@ -20,6 +20,7 @@ No estado atual, o backend ja possui:
 - seed preparada
 - healthcheck
 - autenticacao JWT com registro, login e rota protegida
+- Swagger em `/api/docs`
 - lint, build e testes automatizados
 - Husky, lint-staged e commitlint
 
@@ -33,6 +34,7 @@ No estado atual, o backend ja possui:
 - Docker Compose
 - JWT
 - Passport
+- Swagger
 - Jest
 - ESLint
 - Prettier
@@ -211,11 +213,20 @@ Documentacao detalhada da API: [api.md](e:/directads/docs/api.md)
 
 ## Swagger
 
-Ainda nao configurado.
+Documentacao interativa disponivel em:
 
-Rota prevista para quando a task correspondente for implementada:
+- `http://localhost:3000/api/docs`
 
-- `/api/docs`
+Documento OpenAPI em JSON:
+
+- `http://localhost:3000/api/docs-json`
+
+Como usar bearer token no Swagger:
+
+- autentique em `POST /api/auth/login` ou `POST /api/auth/register`
+- copie o `accessToken`
+- clique em `Authorize` no Swagger
+- informe `Bearer <token>`
 
 ## JWT
 
@@ -241,6 +252,7 @@ Ainda nao implementado.
 - `@prisma/client` e `prisma`: ORM, client tipado e migrations
 - `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`: autenticacao JWT
 - `bcryptjs`: hash e verificacao de senha
+- `@nestjs/swagger` e `swagger-ui-express`: documentacao OpenAPI e UI interativa
 - `class-validator` e `class-transformer`: validacao de DTOs
 - `jest` e `supertest`: testes automatizados
 - `eslint` e `prettier`: qualidade estatica
@@ -252,8 +264,8 @@ Ainda nao implementado.
 - concluido: Docker + PostgreSQL + Prisma
 - concluido: documentacao base
 - concluido: autenticacao JWT
-- proximo: Swagger
-- depois: CRUD principal
+- concluido: Swagger
+- proximo: CRUD principal
 - depois: MFA Microsoft
 
 ## Troubleshooting

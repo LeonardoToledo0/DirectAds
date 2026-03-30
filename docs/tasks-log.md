@@ -35,3 +35,12 @@
 - Decisoes: usar `bcryptjs` para hash de senha; expor apenas dados publicos do usuario nas respostas; manter payload do JWT enxuto com `sub` e `email`; usar um Prisma em memoria no e2e de auth para manter `test:e2e` independente do Postgres
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `feat(backend): implement jwt authentication flow`
+
+## TASK-BE-005 - Swagger
+
+- Status: concluida
+- Objetivo: configurar Swagger e documentar os endpoints atuais de health e autenticacao
+- Arquivos principais: `src/app.setup.ts`, `src/modules/auth/presentation/controllers/auth.controller.ts`, `src/modules/health/presentation/controllers/health.controller.ts`, `src/modules/auth/application/dto/`, `docs/api.md`, `README.md`
+- Decisoes: manter o Swagger sempre habilitado nesta fase; publicar UI em `/api/docs` e JSON em `/api/docs-json`; aplicar bearer auth apenas na rota protegida `GET /api/auth/me`
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, smoke test de `GET /api/docs` e validacao de `GET /api/docs-json`
+- Commit sugerido: `docs(backend): configure swagger documentation`

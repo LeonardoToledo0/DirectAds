@@ -1,6 +1,15 @@
 /* istanbul ignore file -- controller behavior is covered by tests; remaining uncovered branches come from Nest metadata emission */
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
+import { AuthenticatedUserDto } from '../../application/dto/authenticated-user.dto';
 import { AuthResponseDto } from '../../application/dto/auth-response.dto';
 import { LoginDto } from '../../application/dto/login.dto';
 import { RegisterDto } from '../../application/dto/register.dto';
@@ -10,6 +19,7 @@ import { RegisterUserUseCase } from '../../application/use-cases/register-user.u
 import type { JwtPayload } from '../../domain/interfaces/jwt-payload.interface';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   /* istanbul ignore next -- constructor only wires Nest dependencies */
@@ -20,18 +30,39 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @ApiOperation({ summary: 'Registrar um novo usuário' })
+  @ApiOkResponse({
+    description: 'Usuário registrado com sucesso',
+    type: AuthResponseDto,
+  })
+  @ApiConflictResponse({ description: 'Email já está em uso' })
   register(@Body() payload: RegisterDto): Promise<AuthResponseDto> {
     return this.registerUserUseCase.execute(payload);
   }
 
   @Post('login')
+  @ApiOperation({ summary: 'Autenticar um usuário existente' })
+  @ApiOkResponse({
+    description: 'Usuário autenticado com sucesso',
+    type: AuthResponseDto,
+  })
+  @ApiUnauthorizedResponse({ description: 'Credenciais inválidas' })
   login(@Body() payload: LoginDto): Promise<AuthResponseDto> {
     return this.loginUserUseCase.execute(payload);
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  me(@CurrentUser() user: JwtPayload) {
+  @ApiBearerAuth('bearer')
+  @ApiOperation({ summary: 'Retornar o usuário autenticado' })
+  @ApiOkResponse({
+    description: 'Dados do usuário autenticado',
+    type: AuthenticatedUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Token ausente, inválido ou expirado',
+  })
+  me(@CurrentUser() user: JwtPayload): Promise<AuthenticatedUserDto> {
     return this.getAuthenticatedUserUseCase.execute(user.sub);
   }
 }

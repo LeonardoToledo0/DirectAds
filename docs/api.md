@@ -10,6 +10,18 @@ Todos os endpoints atuais usam o prefixo global:
 
 - `/api`
 
+## Swagger
+
+Documentação interativa disponível em:
+
+- `http://localhost:3000/api/docs`
+
+Documento OpenAPI em JSON:
+
+- `http://localhost:3000/api/docs-json`
+
+No Swagger, o endpoint protegido `GET /api/auth/me` usa bearer token.
+
 ## Endpoints disponíveis
 
 ### `GET /api/health`
@@ -94,18 +106,9 @@ Payload atual do token:
 - `sub`
 - `email`
 
-## Swagger
-
-Ainda não configurado.
-
-Quando for implementado, a documentação interativa deverá ficar em:
-
-- `/api/docs`
-
 ## Roadmap da API
 
 Próximos blocos previstos:
 
-- documentação Swagger
 - CRUD do domínio principal
 - MFA Microsoft

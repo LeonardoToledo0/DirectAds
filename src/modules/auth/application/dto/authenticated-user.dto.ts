@@ -1,7 +1,7 @@
 /* istanbul ignore file -- DTO shape is covered; remaining uncovered branch comes from Swagger metadata emission */
 import { ApiProperty } from '@nestjs/swagger';
 
-class AuthUserDto {
+export class AuthenticatedUserDto {
   @ApiProperty({ example: 'user-1' })
   id!: string;
 
@@ -16,15 +16,4 @@ class AuthUserDto {
 
   @ApiProperty({ example: '2026-03-30T00:00:00.000Z' })
   updatedAt!: Date;
-}
-
-export class AuthResponseDto {
-  @ApiProperty({
-    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: 'JWT de acesso do usuário autenticado',
-  })
-  accessToken!: string;
-
-  @ApiProperty({ type: AuthUserDto })
-  user!: AuthUserDto;
 }

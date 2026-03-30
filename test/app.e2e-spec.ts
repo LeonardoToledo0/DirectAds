@@ -10,6 +10,13 @@ interface HealthResponse {
   timestamp: string;
 }
 
+interface OpenApiResponse {
+  paths: Record<string, unknown>;
+  components?: {
+    securitySchemes?: Record<string, unknown>;
+  };
+}
+
 describe('Health endpoint (e2e)', () => {
   let app: INestApplication;
 
@@ -36,5 +43,26 @@ describe('Health endpoint (e2e)', () => {
     expect(body.status).toBe('ok');
     expect(body.service).toBe('directads-backend');
     expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
+  });
+
+  it('/api/docs (GET)', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server).get('/api/docs');
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('swagger-ui');
+  });
+
+  it('/api/docs-json (GET)', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const response = await request(server).get('/api/docs-json');
+    const body = response.body as OpenApiResponse;
+
+    expect(response.status).toBe(200);
+    expect(body.paths['/api/health']).toBeDefined();
+    expect(body.paths['/api/auth/register']).toBeDefined();
+    expect(body.paths['/api/auth/login']).toBeDefined();
+    expect(body.paths['/api/auth/me']).toBeDefined();
+    expect(body.components?.securitySchemes?.bearer).toBeDefined();
   });
 });
