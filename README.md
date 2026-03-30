@@ -92,6 +92,7 @@ docs/
   architecture.md
   setup.md
   api.md
+  auth-mfa-flow.md
   tasks-log.md
 ```
 
@@ -213,6 +214,14 @@ yarn test
 yarn test:integration
 yarn test:cov
 yarn test:e2e
+yarn quality:check
+```
+
+## CI/CD
+
+`GitHub Actions` valida o backend automaticamente em todo `push` e `pull request` usando o mesmo gate local do projeto:
+
+```bash
 yarn quality:check
 ```
 

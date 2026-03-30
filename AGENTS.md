@@ -1196,6 +1196,37 @@ A execução deste backend deve ser dividida nas tasks abaixo.
 
 `docs(backend): add auth and mfa flow diagram`
 
+
+### TASK-BE-014 — Limpeza estrutural e CI/CD
+
+**Objetivo**
+
+- remover diretórios vazios e arquivos `.gitkeep` desnecessários
+- adicionar pipeline de GitHub Actions para validar a integridade do backend a cada push
+- documentar o fluxo de verificação automática e publicação no repositório remoto
+
+**Entregáveis**
+
+- árvore do projeto sem diretórios vazios artificiais
+- workflow em `.github/workflows/` rodando lint, build e testes
+- documentação atualizada com o CI
+- log da task com commit e publicação registrados
+
+**Testes**
+
+- `yarn lint`
+- `yarn type-check`
+- `yarn build`
+- `yarn test`
+- `yarn test:integration`
+- `yarn test:cov`
+- `yarn test:e2e`
+- `yarn quality:check`
+
+**Commit sugerido**
+
+`chore(backend): add github actions quality pipeline`
+
 ---
 
 ## 27. Checklist Automático por Task

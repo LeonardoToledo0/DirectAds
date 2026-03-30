@@ -124,3 +124,14 @@
 - Testes: validacao manual da renderizacao e consistencia do fluxo documentado; `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
 - Endpoints afetados: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/change-password`, `POST /api/mfa/setup`, `POST /api/mfa/enable`, `POST /api/mfa/verify-login`, `DELETE /api/mfa`
 - Commit sugerido: `docs(backend): add auth and mfa flow diagram`
+
+
+## TASK-BE-014 - Limpeza estrutural e CI/CD
+
+- Status: concluida
+- Objetivo: remover diretórios vazios e arquivos `.gitkeep` desnecessários, adicionar CI no GitHub Actions e preparar a publicação do estado validado no repositório remoto
+- Arquivos principais: `.github/workflows/backend-ci.yml`, `README.md`, `docs/architecture.md`, `docs/tasks-log.md`, `AGENTS.md`
+- Decisoes: remover apenas diretórios realmente vazios e `.gitkeep` sem função estrutural; reaproveitar o script `yarn quality:check` como contrato único do pipeline; configurar o workflow para rodar em `push` e `pull_request` com Node.js 22 e cache de Yarn
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
+- Endpoints afetados: nenhum
+- Commit sugerido: `chore(backend): add github actions quality pipeline`
