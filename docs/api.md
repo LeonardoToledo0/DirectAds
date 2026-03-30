@@ -20,7 +20,7 @@ Documento OpenAPI em JSON:
 
 - `http://localhost:3000/api/docs-json`
 
-No Swagger, o endpoint protegido `GET /api/auth/me` usa bearer token.
+No Swagger, os endpoints protegidos de `auth` e `tasks` usam bearer token.
 
 ## Endpoints disponíveis
 
@@ -90,33 +90,79 @@ Requer:
 
 - header `Authorization: Bearer <token>`
 
-## Modelagem pronta para a próxima task
+## CRUD de tasks
 
-O domínio principal já foi preparado internamente com a entidade `Task`.
+Todos os endpoints de `tasks` exigem autenticação JWT.
 
-Campos principais:
+### `POST /api/tasks`
 
-- `id`
-- `title`
-- `description`
-- `status`
-- `userId`
-- `createdAt`
-- `updatedAt`
+Função:
 
-Status disponíveis:
+- criar uma nova task para o usuário autenticado
 
-- `TODO`
-- `IN_PROGRESS`
-- `DONE`
+Payload:
 
-Nesta etapa ainda não há endpoints HTTP para `tasks`; eles entram na TASK-BE-007.
+```json
+{
+  "title": "Preparar demonstracao tecnica",
+  "description": "Organizar roteiro e validacoes",
+  "status": "TODO"
+}
+```
+
+### `GET /api/tasks`
+
+Função:
+
+- listar as tasks do usuário autenticado
+- filtrar opcionalmente por status
+
+Exemplos:
+
+```txt
+http://localhost:3000/api/tasks
+http://localhost:3000/api/tasks?status=IN_PROGRESS
+```
+
+### `GET /api/tasks/:taskId`
+
+Função:
+
+- buscar uma task específica do usuário autenticado
+
+### `PATCH /api/tasks/:taskId`
+
+Função:
+
+- atualizar parcialmente uma task do usuário autenticado
+
+Payload de exemplo:
+
+```json
+{
+  "status": "DONE",
+  "description": null
+}
+```
+
+### `DELETE /api/tasks/:taskId`
+
+Função:
+
+- remover uma task do usuário autenticado
+
+## Regras de ownership
+
+- um usuário só enxerga as próprias tasks
+- acesso a task de outro usuário retorna `404`
+- criação, atualização e remoção operam sempre no contexto do usuário autenticado
 
 ## Status codes relevantes
 
 - `200 OK`
 - `201 Created`
 - `401 Unauthorized`
+- `404 Not Found`
 - `409 Conflict`
 
 ## Autenticação
@@ -132,5 +178,6 @@ Payload atual do token:
 
 Próximos blocos previstos:
 
-- CRUD HTTP do domínio `tasks`
 - MFA Microsoft
+- seed final de avaliação
+- revisão final de entrega

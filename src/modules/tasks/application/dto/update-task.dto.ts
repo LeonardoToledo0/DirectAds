@@ -6,6 +6,7 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import { TaskStatus } from '../../domain/entities/task-status.enum';
 
@@ -26,12 +27,15 @@ export class UpdateTaskDto {
     example: 'Atualizar roteiro com validacoes finais',
     maxLength: 500,
     nullable: true,
-    description: 'Nova descricao da task; pode ser limpa explicitamente',
+    description:
+      'Nova descricao da task; pode ser limpa explicitamente com null',
   })
-  @IsOptional()
+  @ValidateIf(
+    (_object, value: unknown) => value !== undefined && value !== null,
+  )
   @IsString()
   @MaxLength(500)
-  description?: string;
+  description?: string | null;
 
   @ApiPropertyOptional({
     enum: TaskStatus,

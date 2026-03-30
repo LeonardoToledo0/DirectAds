@@ -22,7 +22,7 @@ No estado atual, o backend ja possui:
 - autenticacao JWT com registro, login e rota protegida
 - Swagger em `/api/docs`
 - entidade principal `Task` modelada com ownership por usuario
-- casos de uso e repositorio para o dominio principal
+- CRUD HTTP completo de `tasks` com filtro por status
 - lint, build e testes automatizados
 - Husky, lint-staged e commitlint
 
@@ -215,7 +215,25 @@ O endpoint `GET /api/auth/me` exige:
 
 - `Authorization: Bearer <token>`
 
-A modelagem do dominio `Task` ja foi adicionada internamente, mas os endpoints HTTP de CRUD entram na proxima task.
+### Tasks
+
+Todos os endpoints abaixo exigem:
+
+- `Authorization: Bearer <token>`
+
+Rotas disponiveis:
+
+- `POST /api/tasks`
+- `GET /api/tasks`
+- `GET /api/tasks/:taskId`
+- `PATCH /api/tasks/:taskId`
+- `DELETE /api/tasks/:taskId`
+
+A listagem aceita filtro opcional por status:
+
+- `GET /api/tasks?status=TODO`
+- `GET /api/tasks?status=IN_PROGRESS`
+- `GET /api/tasks?status=DONE`
 
 Documentacao detalhada da API: [api.md](e:/directads/docs/api.md)
 
@@ -235,6 +253,7 @@ Como usar bearer token no Swagger:
 - copie o `accessToken`
 - clique em `Authorize` no Swagger
 - informe `Bearer <token>`
+- use o mesmo token nas rotas de `tasks`
 
 ## JWT
 
@@ -244,6 +263,7 @@ Fluxos implementados:
 - login com comparacao segura de senha
 - emissao de token JWT
 - rota protegida para usuario autenticado
+- CRUD protegido do dominio principal
 
 Payload atual do token:
 
@@ -274,8 +294,9 @@ Ainda nao implementado.
 - concluido: autenticacao JWT
 - concluido: Swagger
 - concluido: modelagem da entidade principal e contratos de repositorio
-- proximo: CRUD principal via HTTP
-- depois: MFA Microsoft
+- concluido: CRUD principal via HTTP
+- proximo: MFA Microsoft
+- depois: seed final de avaliacao
 
 ## Troubleshooting
 

@@ -30,7 +30,8 @@ export class UpdateTaskUseCase {
     return this.taskRepository.update({
       id: existingTask.id,
       title: payload.title?.trim(),
-      description: payload.description?.trim(),
+      description:
+        payload.description === null ? null : payload.description?.trim(),
       status: payload.status,
     });
   }

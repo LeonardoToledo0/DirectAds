@@ -31,6 +31,7 @@ No estado atual:
 
 - [health.controller.ts](e:/directads/src/modules/health/presentation/controllers/health.controller.ts)
 - [auth.controller.ts](e:/directads/src/modules/auth/presentation/controllers/auth.controller.ts)
+- [tasks.controller.ts](e:/directads/src/modules/tasks/presentation/controllers/tasks.controller.ts)
 
 ### Application
 
@@ -118,9 +119,9 @@ Função:
 
 Função:
 
-- modelar o domínio principal do MVP
-- concentrar contratos de repositório e casos de uso do CRUD
-- preservar ownership por usuário antes da exposição HTTP
+- expor o CRUD completo do domínio principal
+- preservar ownership por usuário em todas as operações
+- documentar o contrato HTTP no Swagger
 
 ## Bootstrap da aplicação
 
@@ -157,11 +158,12 @@ Modelagem atual:
 - o backend sobe com ambiente reproduzível via Docker
 - o projeto já nasce com testes e quality gates
 - a documentação acompanha a evolução por task
-- o CRUD principal está sendo preparado em duas etapas: modelagem interna primeiro, API HTTP depois
+- o CRUD principal aplica ownership no caso de uso e no acesso ao repositório
+- o contrato HTTP do domínio principal é documentado diretamente no Swagger do módulo
 
 ## Próximos passos arquiteturais
 
-- expor endpoints REST do módulo `tasks`
-- documentar o CRUD principal no Swagger
-- validar ownership ponta a ponta na camada HTTP
 - introduzir integração de MFA Microsoft
+- modelar o fluxo autenticável complementar da aplicação
+- revisar seed de avaliação com dados úteis para demonstração
+- executar o fortalecimento final de qualidade e entrega

@@ -5,6 +5,7 @@ import { DeleteTaskUseCase } from '../src/modules/tasks/application/use-cases/de
 import { GetTaskByIdUseCase } from '../src/modules/tasks/application/use-cases/get-task-by-id.use-case';
 import { ListTasksUseCase } from '../src/modules/tasks/application/use-cases/list-tasks.use-case';
 import { UpdateTaskUseCase } from '../src/modules/tasks/application/use-cases/update-task.use-case';
+import { TasksController } from '../src/modules/tasks/presentation/controllers/tasks.controller';
 
 describe('Tasks module integration', () => {
   let moduleRef: TestingModule;
@@ -15,7 +16,8 @@ describe('Tasks module integration', () => {
     }).compile();
   });
 
-  it('wires all task use cases through the module graph', () => {
+  it('wires the tasks controller and use cases through the module graph', () => {
+    expect(moduleRef.get(TasksController)).toBeDefined();
     expect(moduleRef.get(CreateTaskUseCase)).toBeDefined();
     expect(moduleRef.get(ListTasksUseCase)).toBeDefined();
     expect(moduleRef.get(GetTaskByIdUseCase)).toBeDefined();

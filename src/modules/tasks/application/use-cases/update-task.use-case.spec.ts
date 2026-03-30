@@ -30,6 +30,27 @@ describe('UpdateTaskUseCase', () => {
     });
   });
 
+  it('allows clearing the description explicitly with null', async () => {
+    const findByIdForOwner = jest.fn().mockResolvedValue({ id: 'task-1' });
+    const update = jest.fn().mockResolvedValue('updated-task');
+    const taskRepository = {
+      findByIdForOwner,
+      update,
+    } as unknown as TaskRepository;
+    const useCase = new UpdateTaskUseCase(taskRepository);
+
+    await useCase.execute('user-1', 'task-1', {
+      description: null,
+    });
+
+    expect(update).toHaveBeenCalledWith({
+      id: 'task-1',
+      title: undefined,
+      description: null,
+      status: undefined,
+    });
+  });
+
   it('throws when the task is not found for the owner', async () => {
     const findByIdForOwner = jest.fn().mockResolvedValue(null);
     const update = jest.fn();

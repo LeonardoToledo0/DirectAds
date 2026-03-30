@@ -53,3 +53,12 @@
 - Decisoes: usar `Task` como entidade principal do MVP com ownership explicito por `userId`; adotar enum de status `TODO`, `IN_PROGRESS` e `DONE`; concentrar o acesso a persistencia em `PrismaTaskRepository`; preparar DTOs e use cases agora e deixar os endpoints REST para a TASK-BE-007
 - Testes: `yarn db:generate`, `yarn db:migrate:dev --name add_tasks_entity`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `feat(backend): add main domain entity and repository contracts`
+
+## TASK-BE-007 - CRUD completo
+
+- Status: concluida
+- Objetivo: expor o CRUD completo de `tasks` por HTTP com JWT, ownership, Swagger e cobertura ponta a ponta
+- Arquivos principais: `src/modules/tasks/presentation/controllers/tasks.controller.ts`, `src/modules/tasks/application/dto/task-response.dto.ts`, `src/modules/tasks/tasks.module.ts`, `test/tasks.e2e-spec.ts`, `test/app.e2e-spec.ts`, `README.md`, `docs/api.md`
+- Decisoes: proteger todas as rotas de `tasks` com JWT; retornar `404` quando a task nao pertence ao usuario autenticado; manter filtro por `status` na listagem; permitir limpeza explicita de `description` com `null` no update; documentar todas as rotas no Swagger em `/api/docs`
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
+- Commit sugerido: `feat(backend): implement full crud for main entity`

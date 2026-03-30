@@ -7,9 +7,19 @@ import { ListTasksUseCase } from './application/use-cases/list-tasks.use-case';
 import { UpdateTaskUseCase } from './application/use-cases/update-task.use-case';
 import { TASK_REPOSITORY } from './domain/interfaces/task-repository.interface';
 import { PrismaTaskRepository } from './infrastructure/repositories/prisma-task.repository';
+import { TasksController } from './presentation/controllers/tasks.controller';
 import { TasksModule } from './tasks.module';
 
 describe('TasksModule', () => {
+  it('registers the tasks controller', () => {
+    const controllers = Reflect.getMetadata(
+      MODULE_METADATA.CONTROLLERS,
+      TasksModule,
+    ) as unknown[] | undefined;
+
+    expect(controllers).toEqual([TasksController]);
+  });
+
   it('registers repository and use cases', () => {
     const providers = Reflect.getMetadata(
       MODULE_METADATA.PROVIDERS,
@@ -21,6 +31,7 @@ describe('TasksModule', () => {
         provide: TASK_REPOSITORY,
         useClass: PrismaTaskRepository,
       },
+      expect.any(Function),
       CreateTaskUseCase,
       ListTasksUseCase,
       GetTaskByIdUseCase,
