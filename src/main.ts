@@ -1,23 +1,15 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { PrismaService } from './prisma/prisma.service';
+import { configureApp } from './app.setup';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const prismaService = app.get(PrismaService);
-
-  app.setGlobalPrefix('api');
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
-  prismaService.enableShutdownHooks(app);
+  configureApp(app);
 
   await app.listen(process.env.PORT ?? 3000);
 }
 
-void bootstrap();
+bootstrap().catch((error: unknown) => {
+  console.error('Application bootstrap failed', error);
+  process.exit(1);
+});

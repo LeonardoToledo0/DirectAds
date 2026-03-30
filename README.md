@@ -1,24 +1,25 @@
 # DirectAds Backend
 
-Backend em NestJS para o teste técnico da aplicação DirectAds.
+Backend em NestJS para a aplicacao DirectAds.
 
-## Visão geral
+## Visao geral
 
-Este repositório contém a API backend do projeto, construída com foco em:
+O projeto esta sendo construido com foco em:
 
 - arquitetura modular
 - tipagem forte
-- infraestrutura reproduzível
-- base pronta para evolução incremental
-- documentação técnica e operacional clara
+- infraestrutura reproduzivel
+- autenticacao segura com JWT
+- documentacao tecnica e operacional clara
 
-No estado atual, o projeto já possui:
+No estado atual, o backend ja possui:
 
 - NestJS com TypeScript
 - PostgreSQL via Docker
-- Prisma configurado com migration inicial
+- Prisma com migration inicial
 - seed preparada
-- endpoint de healthcheck
+- healthcheck
+- autenticacao JWT com registro, login e rota protegida
 - lint, build e testes automatizados
 - Husky, lint-staged e commitlint
 
@@ -30,44 +31,40 @@ No estado atual, o projeto já possui:
 - Prisma
 - Docker
 - Docker Compose
+- JWT
+- Passport
 - Jest
 - ESLint
 - Prettier
-- Husky
-- lint-staged
-- commitlint
 
 ## Arquitetura adotada
 
-O projeto segue uma organização modular inspirada em Clean Architecture, mantendo separação entre:
+O projeto segue uma organizacao modular inspirada em Clean Architecture, separando:
 
-- `application`: casos de uso e orquestração
-- `domain`: contratos e entidades de domínio
-- `presentation`: controllers e camada HTTP
-- `infrastructure`: integrações e acesso a banco
+- `application`
+- `domain`
+- `presentation`
+- `infrastructure`
 
-Hoje a base implementada inclui:
+Modulos implementados ate aqui:
 
-- módulo `health` como ponto inicial funcional
-- módulo global `prisma` para centralizar a conexão com banco
-- `main.ts` com prefixo global `/api` e `ValidationPipe`
+- `health`
+- `prisma`
+- `auth`
 
-Mais detalhes estão em [architecture.md](e:/directads/docs/architecture.md).
+Mais detalhes em [architecture.md](e:/directads/docs/architecture.md).
 
 ## Estrutura de pastas
 
 ```txt
 src/
   modules/
+    auth/
     health/
-      application/
-      domain/
-      presentation/
-      health.module.ts
   prisma/
-    prisma.module.ts
-    prisma.service.ts
+  common/
   app.module.ts
+  app.setup.ts
   main.ts
 
 prisma/
@@ -80,30 +77,25 @@ docs/
   setup.md
   api.md
   tasks-log.md
-
-test/
-  app.e2e-spec.ts
-  health.integration-spec.ts
-  prisma.integration-spec.ts
 ```
 
 ## Como rodar localmente
 
-### 1. Instalar dependências
+### 1. Instalar dependencias
 
 ```bash
 yarn install
 ```
 
-### 2. Criar o arquivo de ambiente
+### 2. Criar `.env`
 
-No Windows:
+Windows:
 
 ```bash
 copy .env.example .env
 ```
 
-Em ambientes Unix:
+Unix:
 
 ```bash
 cp .env.example .env
@@ -115,25 +107,15 @@ cp .env.example .env
 docker compose up -d postgres
 ```
 
-### 4. Gerar o Prisma Client
+### 4. Preparar o Prisma
 
 ```bash
 yarn db:generate
-```
-
-### 5. Aplicar a migration
-
-```bash
 yarn db:migrate:dev
-```
-
-### 6. Rodar a seed
-
-```bash
 yarn db:seed
 ```
 
-### 7. Iniciar a API em modo de desenvolvimento
+### 5. Iniciar a API
 
 ```bash
 yarn start:dev
@@ -141,64 +123,38 @@ yarn start:dev
 
 ## Como rodar com Docker
 
-Para subir backend e banco juntos:
-
 ```bash
 docker compose up --build
 ```
 
-Serviços expostos:
+Servicos expostos:
 
 - API: `http://localhost:3000`
 - PostgreSQL: `localhost:5432`
 
-## Variáveis de ambiente
+## Variaveis de ambiente
 
 Arquivo base: [`.env.example`](e:/directads/.env.example)
 
-Variáveis atuais:
-
 ```env
 PORT=3000
+JWT_SECRET="directads-dev-secret"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
 ```
 
 ## Banco de dados
 
-### Banco oficial
+- PostgreSQL como banco principal
+- Prisma como ORM
+- entidade `User` com `email` unico e `passwordHash`
 
-- PostgreSQL
-
-### ORM
-
-- Prisma
-
-### Comandos úteis
-
-Gerar client:
+Comandos uteis:
 
 ```bash
 yarn db:generate
-```
-
-Criar/aplicar migrations:
-
-```bash
 yarn db:migrate:dev
-```
-
-Executar seed:
-
-```bash
 yarn db:seed
 ```
-
-Schema atual:
-
-- entidade `User`
-- `id` UUID
-- `email` único
-- timestamps automáticos
 
 ## Scripts principais
 
@@ -219,12 +175,12 @@ yarn db:seed
 
 ## Testes
 
-Validações executadas no projeto:
+O projeto possui:
 
-- unitários
-- integração
-- e2e
-- cobertura com threshold global de 100%
+- testes unitarios
+- testes de integracao
+- testes e2e
+- threshold global de cobertura em 100%
 
 Comandos:
 
@@ -235,97 +191,94 @@ yarn test:cov
 yarn test:e2e
 ```
 
-## API disponível neste momento
+## API disponivel neste momento
 
 ### Healthcheck
 
-`GET /api/health`
+- `GET /api/health`
 
-Exemplo:
+### Autenticacao JWT
 
-```txt
-http://localhost:3000/api/health
-```
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
 
-Resposta esperada:
+O endpoint `GET /api/auth/me` exige:
 
-```json
-{
-  "status": "ok",
-  "service": "directads-backend",
-  "timestamp": "2026-03-30T00:00:00.000Z"
-}
-```
+- `Authorization: Bearer <token>`
 
-Documentação atual da API: [api.md](e:/directads/docs/api.md)
+Documentacao detalhada da API: [api.md](e:/directads/docs/api.md)
 
 ## Swagger
 
-O Swagger ainda não foi configurado.
+Ainda nao configurado.
 
-Planejamento atual:
+Rota prevista para quando a task correspondente for implementada:
 
-- rota futura esperada: `/api/docs`
-- configuração prevista na task de Swagger
+- `/api/docs`
 
-## Autenticação JWT
+## JWT
 
-Ainda não implementada.
+Fluxos implementados:
 
-Está prevista para as próximas tasks do projeto.
+- registro com hash de senha
+- login com comparacao segura de senha
+- emissao de token JWT
+- rota protegida para usuario autenticado
+
+Payload atual do token:
+
+- `sub`
+- `email`
 
 ## MFA Microsoft
 
-Ainda não implementado.
+Ainda nao implementado.
 
-Está previsto no roadmap do backend e será integrado em etapa própria.
+## Dependencias e justificativas
 
-## Dependências e justificativas
-
-- `@nestjs/*`: base do framework HTTP e do container de dependências
-- `@prisma/client` e `prisma`: ORM, migrations e acesso tipado ao banco
-- `class-validator` e `class-transformer`: suporte ao `ValidationPipe` e futuros DTOs
-- `jest` e `supertest`: testes unitários, integração e e2e
-- `eslint` e `prettier`: padronização e qualidade estática
-- `husky`, `lint-staged` e `commitlint`: qualidade e consistência no fluxo de commits
+- `@nestjs/*`: base do framework HTTP
+- `@prisma/client` e `prisma`: ORM, client tipado e migrations
+- `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`: autenticacao JWT
+- `bcryptjs`: hash e verificacao de senha
+- `class-validator` e `class-transformer`: validacao de DTOs
+- `jest` e `supertest`: testes automatizados
+- `eslint` e `prettier`: qualidade estatica
+- `husky`, `lint-staged` e `commitlint`: padrao de desenvolvimento
 
 ## Estado atual do roadmap
 
-- concluído: bootstrap do backend
-- concluído: Docker + PostgreSQL + Prisma
-- concluído: documentação base
-- próximo: autenticação JWT
-- depois: Swagger
+- concluido: bootstrap do backend
+- concluido: Docker + PostgreSQL + Prisma
+- concluido: documentacao base
+- concluido: autenticacao JWT
+- proximo: Swagger
 - depois: CRUD principal
 - depois: MFA Microsoft
 
 ## Troubleshooting
 
-### A API não sobe no Docker
-
-Verifique se o Docker Desktop está em execução e tente:
+### A API nao sobe no Docker
 
 ```bash
 docker compose up --build
 ```
 
-### Erro de conexão com o banco
+### Erro de conexao com o banco
 
-Confirme:
+Verifique:
 
-- se o container `postgres` está saudável
-- se o `DATABASE_URL` no `.env` está correto
-- se a migration já foi aplicada
+- se o container `postgres` esta saudavel
+- se o `DATABASE_URL` esta correto
+- se a migration foi aplicada
 
 ### Prisma Client desatualizado
-
-Rode:
 
 ```bash
 yarn db:generate
 ```
 
-## Documentação complementar
+## Documentacao complementar
 
 - [architecture.md](e:/directads/docs/architecture.md)
 - [setup.md](e:/directads/docs/setup.md)

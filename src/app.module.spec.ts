@@ -1,15 +1,16 @@
 import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants';
 import { AppModule } from './app.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 
 describe('AppModule', () => {
-  it('imports the prisma and health modules', () => {
+  it('imports the prisma, health, and auth modules', () => {
     const imports = Reflect.getMetadata(MODULE_METADATA.IMPORTS, AppModule) as
       | unknown[]
       | undefined;
 
-    expect(imports).toEqual([PrismaModule, HealthModule]);
+    expect(imports).toEqual([PrismaModule, HealthModule, AuthModule]);
   });
 });

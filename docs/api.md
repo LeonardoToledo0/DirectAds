@@ -35,13 +35,64 @@ Resposta esperada:
 }
 ```
 
-### Status code
+### `POST /api/auth/register`
+
+Função:
+
+- registrar um novo usuário
+- retornar token JWT e dados públicos do usuário
+
+Payload:
+
+```json
+{
+  "name": "Leona",
+  "email": "leona@example.com",
+  "password": "secret123"
+}
+```
+
+### `POST /api/auth/login`
+
+Função:
+
+- autenticar um usuário existente
+- retornar token JWT e dados públicos do usuário
+
+Payload:
+
+```json
+{
+  "email": "leona@example.com",
+  "password": "secret123"
+}
+```
+
+### `GET /api/auth/me`
+
+Função:
+
+- retornar os dados do usuário autenticado
+
+Requer:
+
+- header `Authorization: Bearer <token>`
+
+### Status codes relevantes
 
 - `200 OK`
+- `201 Created`
+- `401 Unauthorized`
+- `409 Conflict`
 
 ## Autenticação
 
-No estado atual, nenhum endpoint exige autenticação.
+A autenticação JWT já está implementada.
+
+Payload atual do token:
+
+- `sub`
+- `email`
 
 ## Swagger
 
@@ -55,8 +106,6 @@ Quando for implementado, a documentação interativa deverá ficar em:
 
 Próximos blocos previstos:
 
-- autenticação JWT
-- endpoint do usuário autenticado
-- CRUD do domínio principal
 - documentação Swagger
+- CRUD do domínio principal
 - MFA Microsoft

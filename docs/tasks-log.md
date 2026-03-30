@@ -26,3 +26,12 @@
 - Decisoes: documentar apenas o estado real da API atual; manter referencia explicita de que Swagger, JWT e MFA ainda nao foram implementados para evitar desalinhamento entre documentacao e codigo
 - Testes: validacao manual dos comandos e rotas documentadas; `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `docs(backend): add architecture setup and execution documentation`
+
+## TASK-BE-004 - Modulo de autenticacao JWT
+
+- Status: concluida
+- Objetivo: implementar registro, login, guard JWT e endpoint do usuario autenticado
+- Arquivos principais: `src/modules/auth/`, `src/app.module.ts`, `src/main.ts`, `src/app.setup.ts`, `docs/api.md`, `.env.example`
+- Decisoes: usar `bcryptjs` para hash de senha; expor apenas dados publicos do usuario nas respostas; manter payload do JWT enxuto com `sub` e `email`; usar um Prisma em memoria no e2e de auth para manter `test:e2e` independente do Postgres
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
+- Commit sugerido: `feat(backend): implement jwt authentication flow`

@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+import { configureApp } from '../src/app.setup';
 import { AppModule } from '../src/app.module';
 
 interface HealthResponse {
@@ -18,7 +19,7 @@ describe('Health endpoint (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.setGlobalPrefix('api');
+    configureApp(app);
     await app.init();
   });
 
