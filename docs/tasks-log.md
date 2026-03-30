@@ -137,3 +137,14 @@
 - Commit realizado: `21e1e41` - `chore(backend): add github actions quality pipeline`
 - Publicacao: branch `master` publicada em `origin/master` no repositorio `https://github.com/LeonardoToledo0/DirectAds.git`
 - Commit sugerido: `chore(backend): add github actions quality pipeline`
+
+
+## TASK-BE-015 - Endurecimento do workflow de CI
+
+- Status: concluida
+- Objetivo: corrigir a experiencia do GitHub Actions para que a falha apareca na etapa exata, sem depender de um unico comando agregado nem de hooks locais no ambiente de CI
+- Arquivos principais: `.github/workflows/backend-ci.yml`, `README.md`, `docs/architecture.md`, `docs/tasks-log.md`, `AGENTS.md`
+- Decisoes: separar lint, type-check, build, unit, integration, coverage e e2e em steps distintos; habilitar `HUSKY=0` e `CI=true` no workflow para evitar efeitos colaterais de hooks locais; manter `yarn quality:check` apenas como gate local consolidado
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
+- Endpoints afetados: nenhum
+- Commit sugerido: `fix(backend): harden github actions workflow diagnostics`

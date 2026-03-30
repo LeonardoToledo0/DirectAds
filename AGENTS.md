@@ -1227,6 +1227,37 @@ A execução deste backend deve ser dividida nas tasks abaixo.
 
 `chore(backend): add github actions quality pipeline`
 
+
+### TASK-BE-015 — Endurecimento do workflow de CI
+
+**Objetivo**
+
+- tornar o workflow do GitHub Actions diagnostico e previsivel
+- evitar interferencia de hooks locais durante a execucao no CI
+- documentar claramente as etapas automatizadas do pipeline
+
+**Entregáveis**
+
+- workflow com etapas separadas de lint, build e testes
+- ambiente do CI com `HUSKY=0`
+- documentação atualizada com a nova estrategia de validacao
+- log da task atualizado com a correcao do pipeline
+
+**Testes**
+
+- `yarn lint`
+- `yarn type-check`
+- `yarn build`
+- `yarn test`
+- `yarn test:integration`
+- `yarn test:cov`
+- `yarn test:e2e`
+- `yarn quality:check`
+
+**Commit sugerido**
+
+`fix(backend): harden github actions workflow diagnostics`
+
 ---
 
 ## 27. Checklist Automático por Task

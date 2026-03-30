@@ -162,7 +162,7 @@ Modelagem atual:
 - Prisma fica isolado em um modulo proprio
 - o backend sobe com ambiente reproduzivel via Docker
 - o projeto ja nasce com testes e quality gates
-- o pipeline de GitHub Actions executa o mesmo `yarn quality:check` em push e pull request
+- o pipeline de GitHub Actions executa validacoes separadas de lint, type-check, build e testes em push e pull request, com `HUSKY=0` no CI
 - a documentacao acompanha a evolucao por task
 - o CRUD principal aplica ownership no caso de uso e no acesso ao repositorio
 - o contrato HTTP do dominio principal e documentado diretamente no Swagger do modulo
@@ -183,4 +183,5 @@ Modelagem atual:
 - MFA por TOTP com QR code funcional
 - seed de avaliacao reproduzivel
 - quality gates automatizados e validados
+
 

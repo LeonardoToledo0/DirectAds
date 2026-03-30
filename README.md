@@ -219,11 +219,17 @@ yarn quality:check
 
 ## CI/CD
 
-`GitHub Actions` valida o backend automaticamente em todo `push` e `pull request` usando o mesmo gate local do projeto:
+`GitHub Actions` valida o backend automaticamente em todo `push` e `pull request` com etapas separadas para facilitar o diagnostico de falhas:
 
-```bash
-yarn quality:check
-```
+- `yarn lint`
+- `yarn type-check`
+- `yarn build`
+- `yarn test`
+- `yarn test:integration`
+- `yarn test:cov`
+- `yarn test:e2e`
+
+No CI, `HUSKY=0` fica habilitado para evitar interferencia de hooks locais no ambiente automatizado.
 
 ## API disponivel
 
