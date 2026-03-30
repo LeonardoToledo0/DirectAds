@@ -175,3 +175,4 @@ Modelagem atual:
 - MFA por TOTP com QR code funcional
 - seed de avaliacao reproduzivel
 - quality gates automatizados e validados
+

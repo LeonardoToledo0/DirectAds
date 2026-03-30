@@ -42,6 +42,15 @@ interface MeResponseBody {
   updatedAt: string;
 }
 
+interface ChangePasswordResponseBody {
+  id: string;
+  name: string;
+  email: string;
+  mfaEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 describe('Auth endpoints (e2e)', () => {
   let app: INestApplication;
   let passwordService: PasswordService;
@@ -111,6 +120,7 @@ describe('Auth endpoints (e2e)', () => {
           }: {
             where: { id: string };
             data: {
+              passwordHash?: string;
               mfaSecret?: string | null;
               mfaEnabled?: boolean;
               mfaConfirmedAt?: Date | null;
@@ -120,6 +130,10 @@ describe('Auth endpoints (e2e)', () => {
             const currentUser = users[index];
             const updatedUser = {
               ...currentUser,
+              passwordHash:
+                data.passwordHash === undefined
+                  ? currentUser.passwordHash
+                  : data.passwordHash,
               mfaSecret:
                 data.mfaSecret === undefined
                   ? currentUser.mfaSecret
@@ -198,5 +212,54 @@ describe('Auth endpoints (e2e)', () => {
     expect(
       await passwordService.comparePassword('secret123', users[0].passwordHash),
     ).toBe(true);
+  });
+
+  it('changes the password and invalidates the previous credentials', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const registerResponse = await request(server)
+      .post('/api/auth/register')
+      .send({
+        name: 'Leona',
+        email: 'leona@example.com',
+        password: 'secret123',
+      });
+    const registerBody = registerResponse.body as AuthResponseBody;
+
+    const changePasswordResponse = await request(server)
+      .post('/api/auth/change-password')
+      .set('Authorization', `Bearer ${registerBody.accessToken}`)
+      .send({
+        currentPassword: 'secret123',
+        newPassword: 'secret456',
+      });
+    const changePasswordBody =
+      changePasswordResponse.body as ChangePasswordResponseBody;
+
+    expect(changePasswordResponse.status).toBe(200);
+    expect(changePasswordBody.email).toBe('leona@example.com');
+    expect(
+      await passwordService.comparePassword('secret456', users[0].passwordHash),
+    ).toBe(true);
+
+    const oldLoginResponse = await request(server)
+      .post('/api/auth/login')
+      .send({
+        email: 'leona@example.com',
+        password: 'secret123',
+      });
+
+    expect(oldLoginResponse.status).toBe(401);
+
+    const newLoginResponse = await request(server)
+      .post('/api/auth/login')
+      .send({
+        email: 'leona@example.com',
+        password: 'secret456',
+      });
+    const newLoginBody = newLoginResponse.body as LoginResponseBody;
+
+    expect(newLoginResponse.status).toBe(201);
+    expect(newLoginBody.mfaRequired).toBe(false);
+    expect(newLoginBody.accessToken).toEqual(expect.any(String));
   });
 });

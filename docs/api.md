@@ -117,6 +117,27 @@ Requer:
 
 - `Authorization: Bearer <token>`
 
+### `POST /api/auth/change-password`
+
+Funcao:
+
+- validar a senha atual do usuario autenticado
+- persistir o hash da nova senha
+- retornar os dados publicos atualizados do usuario
+
+Requer:
+
+- `Authorization: Bearer <token>`
+
+Payload:
+
+```json
+{
+  "currentPassword": "secret123",
+  "newPassword": "secret456"
+}
+```
+
 ### `POST /api/mfa/setup`
 
 Funcao:
@@ -257,3 +278,4 @@ Apos `yarn db:seed`, o ambiente local fica com:
 - MFA por TOTP com QR code funcional
 - CRUD principal funcional
 - Swagger funcional e alinhado ao contrato real
+

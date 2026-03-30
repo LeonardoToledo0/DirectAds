@@ -90,3 +90,14 @@
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`, `docker compose up --build -d backend`, `GET http://localhost:3000/api/health`, `GET http://localhost:3000/api/docs-json`
 - Commit sugerido: `chore(backend): finalize backend quality gates and delivery readiness`
 
+
+## TASK-BE-011 - Troca de senha do usuario autenticado
+
+- Status: concluida
+- Objetivo: implementar endpoint protegido para troca de senha com validacao da senha atual, persistencia do novo hash e documentacao completa do fluxo
+- Arquivos principais: `src/modules/auth/`, `test/auth.e2e-spec.ts`, `test/auth.integration-spec.ts`, `test/app.e2e-spec.ts`, `README.md`, `docs/api.md`, `docs/architecture.md`, `docs/setup.md`, `AGENTS.md`
+- Decisoes: usar um use case explicito para a troca de senha; manter o endpoint em `auth` por se tratar de manutencao da credencial principal do usuario autenticado; retornar apenas os dados publicos do usuario apos a troca; invalidar a senha anterior ao atualizar o hash persistido; exigir `currentPassword` e `newPassword` no boundary para evitar atualizacao cega da credencial
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
+- Endpoints afetados: `POST /api/auth/change-password`
+- Commit sugerido: `feat(backend): add authenticated password change flow`
+

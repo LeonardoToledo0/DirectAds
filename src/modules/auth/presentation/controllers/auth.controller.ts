@@ -1,5 +1,12 @@
 /* istanbul ignore file -- controller behavior is covered by tests; remaining uncovered branches come from Nest metadata emission */
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
@@ -11,9 +18,11 @@ import {
 import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
 import { AuthenticatedUserDto } from '../../application/dto/authenticated-user.dto';
 import { AuthResponseDto } from '../../application/dto/auth-response.dto';
+import { ChangePasswordDto } from '../../application/dto/change-password.dto';
 import { LoginDto } from '../../application/dto/login.dto';
 import { LoginResponseDto } from '../../application/dto/login-response.dto';
 import { RegisterDto } from '../../application/dto/register.dto';
+import { ChangePasswordUseCase } from '../../application/use-cases/change-password.use-case';
 import { GetAuthenticatedUserUseCase } from '../../application/use-cases/get-authenticated-user.use-case';
 import { LoginUserUseCase } from '../../application/use-cases/login-user.use-case';
 import { RegisterUserUseCase } from '../../application/use-cases/register-user.use-case';
@@ -27,6 +36,7 @@ export class AuthController {
   constructor(
     private readonly registerUserUseCase: RegisterUserUseCase,
     private readonly loginUserUseCase: LoginUserUseCase,
+    private readonly changePasswordUseCase: ChangePasswordUseCase,
     private readonly getAuthenticatedUserUseCase: GetAuthenticatedUserUseCase,
   ) {}
 
@@ -50,6 +60,25 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Credenciais inválidas' })
   login(@Body() payload: LoginDto): Promise<LoginResponseDto> {
     return this.loginUserUseCase.execute(payload);
+  }
+
+  @Post('change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @ApiOperation({ summary: 'Trocar a senha do usuario autenticado' })
+  @HttpCode(200)
+  @ApiOkResponse({
+    description: 'Senha atualizada com sucesso',
+    type: AuthenticatedUserDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Token ausente, invalido, expirado ou senha atual incorreta',
+  })
+  changePassword(
+    @CurrentUser() user: JwtPayload,
+    @Body() payload: ChangePasswordDto,
+  ): Promise<AuthenticatedUserDto> {
+    return this.changePasswordUseCase.execute(user.sub, payload);
   }
 
   @Get('me')

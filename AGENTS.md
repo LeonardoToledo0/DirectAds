@@ -1126,6 +1126,76 @@ A execução deste backend deve ser dividida nas tasks abaixo.
 
 `chore(backend): finalize backend quality gates and delivery readiness`
 
+### TASK-BE-011 — Troca de senha do usuário autenticado
+
+**Objetivo**
+
+- implementar endpoint protegido para troca de senha
+- validar senha atual
+- persistir novo hash de senha
+- documentar o fluxo no Swagger e na documentação operacional
+
+**Entregáveis**
+
+- endpoint de troca de senha funcional
+- DTO e use case dedicados
+- testes unitários, integração e e2e
+
+**Testes**
+
+- unit do use case
+- integração do controller
+- e2e cobrindo troca e invalidação da senha antiga
+
+**Commit sugerido**
+
+`feat(backend): add authenticated password change flow`
+
+### TASK-BE-012 — Remoção do MFA do usuário autenticado
+
+**Objetivo**
+
+- implementar endpoint protegido para desabilitar o MFA
+- limpar `mfaSecret`, `mfaEnabled` e `mfaConfirmedAt`
+- documentar o comportamento no Swagger e nos guias
+
+**Entregáveis**
+
+- endpoint para remover o MFA
+- resposta pública do usuário atualizada
+- testes completos do fluxo
+
+**Testes**
+
+- unit do use case
+- integração do controller
+- e2e cobrindo remoção e login subsequente sem segunda etapa
+
+**Commit sugerido**
+
+`feat(backend): add authenticated mfa removal flow`
+
+### TASK-BE-013 — Diagrama do fluxo de cadastro e login com MFA
+
+**Objetivo**
+
+- documentar visualmente o fluxo de cadastro, setup do MFA e login em duas etapas
+- deixar o material pronto para avaliação técnica e onboarding
+
+**Entregáveis**
+
+- desenho/diagrama do fluxo
+- README e docs referenciando o material
+- log da task atualizado com os commits realizados
+
+**Testes**
+
+- validação manual da documentação e dos links internos
+
+**Commit sugerido**
+
+`docs(backend): add auth and mfa flow diagram`
+
 ---
 
 ## 27. Checklist Automático por Task
@@ -1190,3 +1260,6 @@ Ao final, o backend deve ser:
 - fácil de manter
 - fácil de defender tecnicamente
 - pronto para evolução incremental
+
+
+

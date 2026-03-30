@@ -222,9 +222,14 @@ yarn quality:check
 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
+- `POST /api/auth/change-password`
 - `GET /api/auth/me`
 
 `GET /api/auth/me` exige:
+
+- `Authorization: Bearer <token>`
+
+`POST /api/auth/change-password` exige:
 
 - `Authorization: Bearer <token>`
 
@@ -294,6 +299,7 @@ Fluxos implementados:
 
 - registro com hash de senha
 - login com comparacao segura de senha
+- troca de senha autenticada com validacao da senha atual
 - emissao de JWT
 - rota protegida para usuario autenticado
 - setup de MFA por QR code
@@ -369,6 +375,14 @@ Verifique:
 yarn db:generate
 ```
 
+### A troca de senha foi recusada
+
+Verifique:
+
+- se a requisicao foi feita em `POST /api/auth/change-password`
+- se o token JWT do usuario autenticado foi enviado
+- se `currentPassword` corresponde exatamente a senha atual
+- se `newPassword` e diferente da senha atual
 ### O login esta pedindo token MFA
 
 Verifique:
@@ -391,6 +405,7 @@ Verifique:
 - [setup.md](e:/directads/docs/setup.md)
 - [api.md](e:/directads/docs/api.md)
 - [tasks-log.md](e:/directads/docs/tasks-log.md)
+
 
 
 

@@ -106,7 +106,18 @@ Fluxo esperado:
 5. chame `POST /api/mfa/enable` com esse codigo
 6. nos proximos logins, use `POST /api/auth/login` e depois `POST /api/mfa/verify-login`
 
-## 10. Rodar validacoes
+## 10. Trocar a senha do usuario autenticado
+
+Use o endpoint protegido abaixo depois de estar autenticado:
+
+```json
+POST /api/auth/change-password
+{
+  "currentPassword": "secret123",
+  "newPassword": "secret456"
+}
+```
+## 11. Rodar validacoes
 
 ```bash
 yarn lint
@@ -194,3 +205,4 @@ Acao:
 - verifique se `TOTP_APP_NAME` esta preenchido
 - gere o setup novamente em `POST /api/mfa/setup`
 - use o `otpauthUrl` como alternativa para importacao manual
+

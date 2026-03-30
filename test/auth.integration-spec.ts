@@ -16,4 +16,8 @@ describe('Auth module integration', () => {
   it('wires the auth controller through the module graph', () => {
     expect(controller).toBeDefined();
   });
+
+  it('exposes the password change endpoint on the auth controller', () => {
+    expect(typeof controller.changePassword).toBe('function');
+  });
 });
