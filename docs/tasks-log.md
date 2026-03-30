@@ -134,4 +134,6 @@
 - Decisoes: remover apenas diretórios realmente vazios e `.gitkeep` sem função estrutural; reaproveitar o script `yarn quality:check` como contrato único do pipeline; configurar o workflow para rodar em `push` e `pull_request` com Node.js 22 e cache de Yarn
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
 - Endpoints afetados: nenhum
+- Commit realizado: `21e1e41` - `chore(backend): add github actions quality pipeline`
+- Publicacao: branch `master` publicada em `origin/master` no repositorio `https://github.com/LeonardoToledo0/DirectAds.git`
 - Commit sugerido: `chore(backend): add github actions quality pipeline`
