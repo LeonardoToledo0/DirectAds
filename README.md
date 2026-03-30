@@ -23,6 +23,7 @@ No estado atual, o backend ja possui:
 - Swagger em `/api/docs`
 - entidade principal `Task` modelada com ownership por usuario
 - CRUD HTTP completo de `tasks` com filtro por status
+- fluxo Microsoft MFA desacoplado e testavel com provider mockado
 - lint, build e testes automatizados
 - Husky, lint-staged e commitlint
 
@@ -56,6 +57,7 @@ Modulos implementados ate aqui:
 - `prisma`
 - `auth`
 - `tasks`
+- `mfa`
 
 Mais detalhes em [architecture.md](e:/directads/docs/architecture.md).
 
@@ -66,6 +68,7 @@ src/
   modules/
     auth/
     health/
+    mfa/
     tasks/
   prisma/
   common/
@@ -146,13 +149,21 @@ Arquivo base: [`.env.example`](e:/directads/.env.example)
 PORT=3000
 JWT_SECRET="directads-dev-secret"
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/directads?schema=public"
+MICROSOFT_CLIENT_ID="directads-local-client"
+MICROSOFT_TENANT_ID="common"
+MICROSOFT_REDIRECT_URI="http://localhost:3000/auth/microsoft/callback"
+MICROSOFT_MOCK_AUTH_CODE="mock-microsoft-auth-code"
+MICROSOFT_MOCK_VERIFICATION_CODE="123456"
+MICROSOFT_MOCK_USER_ID="microsoft-user-1"
+MICROSOFT_MOCK_USER_EMAIL="microsoft.user@example.com"
+MICROSOFT_MOCK_USER_NAME="Microsoft User"
 ```
 
 ## Banco de dados
 
 - PostgreSQL como banco principal
 - Prisma como ORM
-- entidade `User` com `email` unico e `passwordHash`
+- entidade `User` com `email` unico, `passwordHash` e vinculo opcional `microsoftAccountId`
 - entidade `Task` vinculada a `User` por `userId`
 - enum `TaskStatus` com `TODO`, `IN_PROGRESS` e `DONE`
 
@@ -235,6 +246,20 @@ A listagem aceita filtro opcional por status:
 - `GET /api/tasks?status=IN_PROGRESS`
 - `GET /api/tasks?status=DONE`
 
+### Microsoft MFA
+
+Rotas disponiveis:
+
+- `POST /api/mfa/microsoft/start`
+- `POST /api/mfa/microsoft/verify`
+
+Fluxo implementado:
+
+- o backend gera uma `authorizationUrl` Microsoft e um `state` assinado
+- o client simula ou recebe o `code` devolvido pelo provider Microsoft
+- o backend valida `state`, troca o `code` pela identidade Microsoft e exige um `verificationCode` de segunda etapa
+- apos a verificacao, o backend localiza, vincula ou cria o usuario local e emite o JWT da API
+
 Documentacao detalhada da API: [api.md](e:/directads/docs/api.md)
 
 ## Swagger
@@ -249,7 +274,7 @@ Documento OpenAPI em JSON:
 
 Como usar bearer token no Swagger:
 
-- autentique em `POST /api/auth/login` ou `POST /api/auth/register`
+- autentique em `POST /api/auth/login`, `POST /api/auth/register` ou conclua o fluxo `POST /api/mfa/microsoft/verify`
 - copie o `accessToken`
 - clique em `Authorize` no Swagger
 - informe `Bearer <token>`
@@ -264,6 +289,7 @@ Fluxos implementados:
 - emissao de token JWT
 - rota protegida para usuario autenticado
 - CRUD protegido do dominio principal
+- emissao de JWT local apos fluxo Microsoft MFA validado
 
 Payload atual do token:
 
@@ -272,13 +298,27 @@ Payload atual do token:
 
 ## MFA Microsoft
 
-Ainda nao implementado.
+O projeto ja possui um fluxo Microsoft MFA desacoplado para uso local e testes automatizados.
+
+Comportamento atual:
+
+- provider mockado e configuravel por variaveis de ambiente
+- URL federada Microsoft gerada no endpoint de inicio
+- state assinada com JWT para proteger o retorno do fluxo
+- validacao de segunda etapa via `verificationCode`
+- vinculacao da identidade Microsoft em `User.microsoftAccountId`
+- criacao automatica do usuario local quando necessario
+
+Valores mock padrao para ambiente local:
+
+- `MICROSOFT_MOCK_AUTH_CODE=mock-microsoft-auth-code`
+- `MICROSOFT_MOCK_VERIFICATION_CODE=123456`
 
 ## Dependencias e justificativas
 
 - `@nestjs/*`: base do framework HTTP
 - `@prisma/client` e `prisma`: ORM, client tipado e migrations
-- `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`: autenticacao JWT
+- `@nestjs/jwt`, `@nestjs/passport`, `passport`, `passport-jwt`: autenticacao JWT e assinatura de state do fluxo Microsoft
 - `bcryptjs`: hash e verificacao de senha
 - `@nestjs/swagger` e `swagger-ui-express`: documentacao OpenAPI e UI interativa
 - `class-validator` e `class-transformer`: validacao de DTOs
@@ -295,8 +335,9 @@ Ainda nao implementado.
 - concluido: Swagger
 - concluido: modelagem da entidade principal e contratos de repositorio
 - concluido: CRUD principal via HTTP
-- proximo: MFA Microsoft
-- depois: seed final de avaliacao
+- concluido: MFA Microsoft
+- proximo: seed final de avaliacao
+- depois: fortalecimento final de qualidade
 
 ## Troubleshooting
 
@@ -319,6 +360,14 @@ Verifique:
 ```bash
 yarn db:generate
 ```
+
+### Fluxo Microsoft MFA recusando o mock
+
+Verifique:
+
+- se `MICROSOFT_MOCK_AUTH_CODE` bate com o `code` enviado para `/api/mfa/microsoft/verify`
+- se `MICROSOFT_MOCK_VERIFICATION_CODE` bate com o `verificationCode`
+- se o `state` usado no verify veio do endpoint `/api/mfa/microsoft/start`
 
 ## Documentacao complementar
 

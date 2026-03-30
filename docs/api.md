@@ -151,11 +151,56 @@ Função:
 
 - remover uma task do usuário autenticado
 
+## Microsoft MFA
+
+### `POST /api/mfa/microsoft/start`
+
+Função:
+
+- iniciar o fluxo federado Microsoft MFA
+- devolver `authorizationUrl` e `state` assinada
+
+Payload opcional:
+
+```json
+{
+  "redirectUri": "http://localhost:3000/auth/microsoft/callback"
+}
+```
+
+### `POST /api/mfa/microsoft/verify`
+
+Função:
+
+- validar o `state` assinado
+- trocar o `code` pela identidade Microsoft no provider
+- validar a segunda etapa MFA via `verificationCode`
+- localizar, vincular ou criar o usuário local
+- emitir JWT da API
+
+Payload:
+
+```json
+{
+  "code": "mock-microsoft-auth-code",
+  "state": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "verificationCode": "123456"
+}
+```
+
 ## Regras de ownership
 
 - um usuário só enxerga as próprias tasks
 - acesso a task de outro usuário retorna `404`
 - criação, atualização e remoção operam sempre no contexto do usuário autenticado
+
+## Regras do fluxo Microsoft MFA
+
+- o `state` deve vir do endpoint `POST /api/mfa/microsoft/start`
+- o `code` precisa bater com o provider Microsoft configurado
+- a segunda etapa exige `verificationCode` válido
+- o usuário local é vinculado por `microsoftAccountId` quando aplicável
+- quando não existe usuário local, o backend cria um automaticamente e emite o JWT local
 
 ## Status codes relevantes
 
@@ -178,6 +223,5 @@ Payload atual do token:
 
 Próximos blocos previstos:
 
-- MFA Microsoft
 - seed final de avaliação
 - revisão final de entrega

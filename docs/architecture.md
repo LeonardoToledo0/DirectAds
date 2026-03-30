@@ -32,6 +32,7 @@ No estado atual:
 - [health.controller.ts](e:/directads/src/modules/health/presentation/controllers/health.controller.ts)
 - [auth.controller.ts](e:/directads/src/modules/auth/presentation/controllers/auth.controller.ts)
 - [tasks.controller.ts](e:/directads/src/modules/tasks/presentation/controllers/tasks.controller.ts)
+- [microsoft-mfa.controller.ts](e:/directads/src/modules/mfa/presentation/controllers/microsoft-mfa.controller.ts)
 
 ### Application
 
@@ -52,6 +53,8 @@ No estado atual:
 - [get-task-by-id.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/get-task-by-id.use-case.ts)
 - [update-task.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/update-task.use-case.ts)
 - [delete-task.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/delete-task.use-case.ts)
+- [start-microsoft-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/start-microsoft-mfa.use-case.ts)
+- [verify-microsoft-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/verify-microsoft-mfa.use-case.ts)
 
 ### Domain
 
@@ -67,6 +70,7 @@ No estado atual:
 - [authenticated-user.interface.ts](e:/directads/src/modules/auth/domain/interfaces/authenticated-user.interface.ts)
 - [task.entity.ts](e:/directads/src/modules/tasks/domain/entities/task.entity.ts)
 - [task-repository.interface.ts](e:/directads/src/modules/tasks/domain/interfaces/task-repository.interface.ts)
+- [microsoft-mfa-provider.interface.ts](e:/directads/src/modules/mfa/domain/interfaces/microsoft-mfa-provider.interface.ts)
 
 ### Infrastructure
 
@@ -81,6 +85,7 @@ No estado atual:
 - [prisma.service.ts](e:/directads/src/prisma/prisma.service.ts)
 - [prisma.module.ts](e:/directads/src/prisma/prisma.module.ts)
 - [prisma-task.repository.ts](e:/directads/src/modules/tasks/infrastructure/repositories/prisma-task.repository.ts)
+- [mock-microsoft-mfa.provider.ts](e:/directads/src/modules/mfa/infrastructure/providers/mock-microsoft-mfa.provider.ts)
 
 ## Organização de módulos
 
@@ -92,6 +97,7 @@ Hoje os módulos implementados são:
 - `prisma`
 - `auth`
 - `tasks`
+- `mfa`
 
 ### Módulo health
 
@@ -123,6 +129,15 @@ Função:
 - preservar ownership por usuário em todas as operações
 - documentar o contrato HTTP no Swagger
 
+### Módulo mfa
+
+Função:
+
+- iniciar o fluxo federado Microsoft
+- validar o retorno do provider e a segunda etapa MFA
+- vincular a identidade Microsoft ao usuário local
+- emitir o JWT local após a autenticação complementar
+
 ## Bootstrap da aplicação
 
 Arquivo principal:
@@ -148,6 +163,7 @@ Modelagem atual:
 - tabela `tasks`
 - UUID como identificador
 - `email` com unicidade
+- `User.microsoftAccountId` para vincular a identidade Microsoft
 - `Task.userId` como ownership explícito
 - enum `TaskStatus` para o ciclo principal da entidade
 - timestamps de criação e atualização
@@ -160,10 +176,11 @@ Modelagem atual:
 - a documentação acompanha a evolução por task
 - o CRUD principal aplica ownership no caso de uso e no acesso ao repositório
 - o contrato HTTP do domínio principal é documentado diretamente no Swagger do módulo
+- o fluxo Microsoft MFA usa provider desacoplado para permitir troca futura pelo SDK real sem afetar os casos de uso
+- o ambiente local usa provider mockado e reproduzível para manter os testes automatizados estáveis
 
 ## Próximos passos arquiteturais
 
-- introduzir integração de MFA Microsoft
-- modelar o fluxo autenticável complementar da aplicação
-- revisar seed de avaliação com dados úteis para demonstração
-- executar o fortalecimento final de qualidade e entrega
+- revisar a seed com dados úteis para avaliacao
+- fortalecer o checklist final de entrega
+- revisar detalhes finais de docker, scripts e documentacao

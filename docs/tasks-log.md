@@ -62,3 +62,12 @@
 - Decisoes: proteger todas as rotas de `tasks` com JWT; retornar `404` quando a task nao pertence ao usuario autenticado; manter filtro por `status` na listagem; permitir limpeza explicita de `description` com `null` no update; documentar todas as rotas no Swagger em `/api/docs`
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
 - Commit sugerido: `feat(backend): implement full crud for main entity`
+
+## TASK-BE-008 - MFA Microsoft
+
+- Status: concluida
+- Objetivo: adicionar fluxo Microsoft MFA desacoplado, com provider configuravel, state assinada, segunda etapa de verificacao e emissao de JWT local
+- Arquivos principais: `src/modules/mfa/`, `prisma/schema.prisma`, `prisma/migrations/20260330221500_add_microsoft_account_link/`, `.env.example`, `README.md`, `docs/api.md`, `docs/architecture.md`
+- Decisoes: usar um provider Microsoft mockado e configuravel por `.env` para manter o projeto executavel offline; vincular a identidade Microsoft em `User.microsoftAccountId`; criar automaticamente o usuario local quando a identidade Microsoft ainda nao existir; proteger o retorno do fluxo com `state` assinada em JWT e exigir `verificationCode` como segunda etapa MFA
+- Testes: `yarn db:generate`, `npx prisma migrate deploy`, `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`
+- Commit sugerido: `feat(backend): add microsoft mfa authentication flow`
