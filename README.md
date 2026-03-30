@@ -42,7 +42,7 @@ No estado atual, o backend possui:
 - Jest
 - ESLint
 - Prettier
-- `otplib`
+- `node:crypto`
 - `qrcode`
 
 ## Arquitetura adotada
@@ -63,6 +63,10 @@ Modulos implementados:
 - `mfa`
 
 Mais detalhes em [architecture.md](e:/directads/docs/architecture.md).
+
+Fluxo visual de autenticacao e MFA:
+
+- [auth-mfa-flow.md](e:/directads/docs/auth-mfa-flow.md)
 
 ## Estrutura de pastas
 
@@ -309,6 +313,10 @@ Fluxos implementados:
 - remocao autenticada do MFA com limpeza do estado TOTP
 - login em duas etapas quando `mfaEnabled=true`
 
+Diagrama do fluxo:
+
+- [auth-mfa-flow.md](e:/directads/docs/auth-mfa-flow.md)
+
 Payload atual do token final:
 
 - `sub`
@@ -386,6 +394,7 @@ Verifique:
 - se o token JWT do usuario autenticado foi enviado
 - se `currentPassword` corresponde exatamente a senha atual
 - se `newPassword` e diferente da senha atual
+
 ### O login esta pedindo token MFA
 
 Verifique:
@@ -401,6 +410,7 @@ Verifique:
 - se a requisicao foi feita em `DELETE /api/mfa`
 - se o token JWT do usuario autenticado foi enviado
 - se o usuario realmente estava autenticado com a conta correta
+
 ### O QR code nao foi aceito
 
 Verifique:
@@ -414,9 +424,6 @@ Verifique:
 - [architecture.md](e:/directads/docs/architecture.md)
 - [setup.md](e:/directads/docs/setup.md)
 - [api.md](e:/directads/docs/api.md)
+- [auth-mfa-flow.md](e:/directads/docs/auth-mfa-flow.md)
 - [tasks-log.md](e:/directads/docs/tasks-log.md)
-
-
-
-
 

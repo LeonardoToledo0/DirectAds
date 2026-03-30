@@ -99,6 +99,7 @@
 - Decisoes: usar um use case explicito para a troca de senha; manter o endpoint em `auth` por se tratar de manutencao da credencial principal do usuario autenticado; retornar apenas os dados publicos do usuario apos a troca; invalidar a senha anterior ao atualizar o hash persistido; exigir `currentPassword` e `newPassword` no boundary para evitar atualizacao cega da credencial
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
 - Endpoints afetados: `POST /api/auth/change-password`
+- Commit realizado: `399dbe1` - `feat(backend): add authenticated password change flow`
 - Commit sugerido: `feat(backend): add authenticated password change flow`
 
 
@@ -110,4 +111,16 @@
 - Decisoes: usar `DELETE /api/mfa` como contrato direto para remocao do segundo fator; limpar `mfaSecret`, `mfaEnabled` e `mfaConfirmedAt` em uma unica operacao; retornar `TotpMfaStatusDto` para manter o contrato enxuto e alinhado ao estado de MFA; validar em e2e que o login volta a nao exigir a segunda etapa apos a remocao
 - Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
 - Endpoints afetados: `DELETE /api/mfa`
+- Commit realizado: `354c2d2` - `feat(backend): add authenticated mfa removal flow`
 - Commit sugerido: `feat(backend): add authenticated mfa removal flow`
+
+
+## TASK-BE-013 - Diagrama do fluxo de cadastro, login e MFA
+
+- Status: concluida
+- Objetivo: documentar visualmente o fluxo de cadastro, configuracao do MFA por TOTP, login em duas etapas e remocao do segundo fator
+- Arquivos principais: `docs/auth-mfa-flow.md`, `README.md`, `docs/api.md`, `docs/setup.md`, `docs/tasks-log.md`
+- Decisoes: usar Mermaid em Markdown para manter o diagrama versionado junto ao codigo; separar o desenho em um arquivo proprio para facilitar referencia cruzada no README, API e setup; registrar no log os commits efetivos das tasks 11, 12 e 13 para manter a trilha auditavel
+- Testes: validacao manual da renderizacao e consistencia do fluxo documentado; `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
+- Endpoints afetados: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/change-password`, `POST /api/mfa/setup`, `POST /api/mfa/enable`, `POST /api/mfa/verify-login`, `DELETE /api/mfa`
+- Commit sugerido: `docs(backend): add auth and mfa flow diagram`

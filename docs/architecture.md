@@ -169,6 +169,11 @@ Modelagem atual:
 - a segunda etapa de login usa um `mfaToken` temporario assinado para evitar emissao prematura do JWT final
 - o container do backend aplica migrations automaticamente na inicializacao para reduzir atrito na avaliacao
 
+
+## Diagramas de apoio
+
+- Fluxo visual de cadastro, login e MFA: [auth-mfa-flow.md](e:/directads/docs/auth-mfa-flow.md)
+
 ## Estado final da arquitetura
 
 - modulos principais implementados e documentados

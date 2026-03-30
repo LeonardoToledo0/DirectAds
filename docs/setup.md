@@ -107,6 +107,10 @@ Fluxo esperado:
 6. nos proximos logins, use `POST /api/auth/login` e depois `POST /api/mfa/verify-login`
 7. se quiser desabilitar o MFA, use `DELETE /api/mfa` autenticado com JWT
 
+Diagrama do fluxo:
+
+- [auth-mfa-flow.md](e:/directads/docs/auth-mfa-flow.md)
+
 ## 10. Trocar a senha do usuario autenticado
 
 Use o endpoint protegido abaixo depois de estar autenticado:
@@ -118,6 +122,7 @@ POST /api/auth/change-password
   "newPassword": "secret456"
 }
 ```
+
 ## 11. Remover o MFA do usuario autenticado
 
 Use o endpoint protegido abaixo depois de estar autenticado:
@@ -125,6 +130,7 @@ Use o endpoint protegido abaixo depois de estar autenticado:
 ```txt
 DELETE /api/mfa
 ```
+
 ## 12. Rodar validacoes
 
 ```bash
@@ -225,3 +231,5 @@ Acao:
 
 - confirme se `DELETE /api/mfa` respondeu com `200`
 - faca login novamente para validar o novo estado
+
+

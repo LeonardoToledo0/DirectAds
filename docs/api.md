@@ -293,4 +293,9 @@ Apos `yarn db:seed`, o ambiente local fica com:
 - CRUD principal funcional
 - Swagger funcional e alinhado ao contrato real
 
+Fluxo visual complementar:
+
+- [auth-mfa-flow.md](e:/directads/docs/auth-mfa-flow.md)
+
+
 
