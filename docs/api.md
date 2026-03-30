@@ -179,6 +179,18 @@ Payload:
 }
 ```
 
+### `DELETE /api/mfa`
+
+Funcao:
+
+- remover o MFA TOTP do usuario autenticado
+- limpar `mfaSecret`, `mfaEnabled` e `mfaConfirmedAt`
+- permitir que os proximos logins voltem a acontecer sem a segunda etapa
+
+Requer:
+
+- `Authorization: Bearer <token>`
+
 ### `POST /api/mfa/verify-login`
 
 Funcao:
@@ -245,6 +257,7 @@ Remove uma task do usuario autenticado.
 - o setup do MFA e feito depois do cadastro ou depois de um login normal ja autenticado
 - o endpoint `POST /api/mfa/setup` sempre gera um novo `secret` e invalida qualquer configuracao anterior ainda nao confirmada
 - o endpoint `POST /api/mfa/enable` ativa o MFA somente apos validar um codigo TOTP valido
+- o endpoint `DELETE /api/mfa` remove o secret persistido e desabilita a segunda etapa
 - quando `mfaEnabled=true`, o login deixa de entregar o JWT final na primeira etapa
 - a segunda etapa deve ser concluida em `POST /api/mfa/verify-login`
 - o TOTP e compativel com Microsoft Authenticator, Google Authenticator e apps equivalentes
@@ -276,6 +289,8 @@ Apos `yarn db:seed`, o ambiente local fica com:
 - healthcheck funcional
 - auth JWT funcional
 - MFA por TOTP com QR code funcional
+- remocao autenticada do MFA funcional
 - CRUD principal funcional
 - Swagger funcional e alinhado ao contrato real
+
 

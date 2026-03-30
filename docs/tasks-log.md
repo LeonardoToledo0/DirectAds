@@ -101,3 +101,13 @@
 - Endpoints afetados: `POST /api/auth/change-password`
 - Commit sugerido: `feat(backend): add authenticated password change flow`
 
+
+## TASK-BE-012 - Remocao do MFA do usuario autenticado
+
+- Status: concluida
+- Objetivo: implementar endpoint protegido para desabilitar o MFA, limpar o estado TOTP persistido e documentar o comportamento atualizado do login
+- Arquivos principais: `src/modules/mfa/`, `test/mfa.e2e-spec.ts`, `test/mfa.integration-spec.ts`, `test/app.e2e-spec.ts`, `README.md`, `docs/api.md`, `docs/architecture.md`, `docs/setup.md`
+- Decisoes: usar `DELETE /api/mfa` como contrato direto para remocao do segundo fator; limpar `mfaSecret`, `mfaEnabled` e `mfaConfirmedAt` em uma unica operacao; retornar `TotpMfaStatusDto` para manter o contrato enxuto e alinhado ao estado de MFA; validar em e2e que o login volta a nao exigir a segunda etapa apos a remocao
+- Testes: `yarn lint`, `yarn type-check`, `yarn build`, `yarn test`, `yarn test:integration`, `yarn test:cov`, `yarn test:e2e`, `yarn quality:check`
+- Endpoints afetados: `DELETE /api/mfa`
+- Commit sugerido: `feat(backend): add authenticated mfa removal flow`

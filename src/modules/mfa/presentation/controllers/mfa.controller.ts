@@ -1,5 +1,5 @@
 /* istanbul ignore file -- controller behavior is covered by tests; remaining uncovered branches come from Nest metadata emission */
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -17,6 +17,7 @@ import { TotpMfaStatusDto } from '../../application/dto/totp-mfa-status.dto';
 import { TotpSetupResponseDto } from '../../application/dto/totp-setup-response.dto';
 import { VerifyTotpLoginDto } from '../../application/dto/verify-totp-login.dto';
 import { EnableTotpMfaUseCase } from '../../application/use-cases/enable-totp-mfa.use-case';
+import { DisableTotpMfaUseCase } from '../../application/use-cases/disable-totp-mfa.use-case';
 import { SetupTotpMfaUseCase } from '../../application/use-cases/setup-totp-mfa.use-case';
 import { VerifyTotpLoginUseCase } from '../../application/use-cases/verify-totp-login.use-case';
 
@@ -27,6 +28,7 @@ export class MfaController {
   constructor(
     private readonly setupTotpMfaUseCase: SetupTotpMfaUseCase,
     private readonly enableTotpMfaUseCase: EnableTotpMfaUseCase,
+    private readonly disableTotpMfaUseCase: DisableTotpMfaUseCase,
     private readonly verifyTotpLoginUseCase: VerifyTotpLoginUseCase,
   ) {}
 
@@ -65,6 +67,21 @@ export class MfaController {
     @Body() payload: EnableTotpMfaDto,
   ): Promise<TotpMfaStatusDto> {
     return this.enableTotpMfaUseCase.execute(user.sub, payload);
+  }
+
+  @Delete()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('bearer')
+  @ApiOperation({ summary: 'Remover o MFA TOTP do usuario autenticado' })
+  @ApiOkResponse({
+    description: 'MFA removido com sucesso',
+    type: TotpMfaStatusDto,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Token ausente, invalido ou expirado',
+  })
+  disable(@CurrentUser() user: JwtPayload): Promise<TotpMfaStatusDto> {
+    return this.disableTotpMfaUseCase.execute(user.sub);
   }
 
   @Post('verify-login')

@@ -54,6 +54,7 @@ No estado atual:
 - [delete-task.use-case.ts](e:/directads/src/modules/tasks/application/use-cases/delete-task.use-case.ts)
 - [setup-totp-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/setup-totp-mfa.use-case.ts)
 - [enable-totp-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/enable-totp-mfa.use-case.ts)
+- [disable-totp-mfa.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/disable-totp-mfa.use-case.ts)
 - [verify-totp-login.use-case.ts](e:/directads/src/modules/mfa/application/use-cases/verify-totp-login.use-case.ts)
 
 ### Domain
@@ -123,6 +124,7 @@ Funcao:
 - gerar secret TOTP por usuario autenticado
 - devolver QR code e `otpauthUrl` para cadastro no app autenticador
 - confirmar o primeiro codigo TOTP e ativar MFA
+- remover o MFA limpando o estado persistido do segundo fator
 - concluir o login em segunda etapa quando `mfaEnabled=true`
 
 ## Bootstrap da aplicacao
@@ -175,4 +177,5 @@ Modelagem atual:
 - MFA por TOTP com QR code funcional
 - seed de avaliacao reproduzivel
 - quality gates automatizados e validados
+
 

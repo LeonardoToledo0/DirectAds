@@ -48,6 +48,11 @@ interface VerifyLoginResponseBody {
   };
 }
 
+interface DisableMfaResponseBody {
+  mfaEnabled: boolean;
+  mfaConfirmedAt: string | null;
+}
+
 describe('TOTP MFA endpoints (e2e)', () => {
   let app: INestApplication;
   let users: Array<{
@@ -217,5 +222,52 @@ describe('TOTP MFA endpoints (e2e)', () => {
     expect(verifyLoginResponse.status).toBe(201);
     expect(verifyLoginBody.accessToken).toEqual(expect.any(String));
     expect(verifyLoginBody.user.mfaEnabled).toBe(true);
+  });
+
+  it('disables MFA and allows the next login without the second step', async () => {
+    const server = app.getHttpServer() as Parameters<typeof request>[0];
+    const registerResponse = await request(server)
+      .post('/api/auth/register')
+      .send({
+        name: 'Leona',
+        email: 'leona@example.com',
+        password: 'secret123',
+      });
+    const registerBody = registerResponse.body as RegisterResponseBody;
+
+    const setupResponse = await request(server)
+      .post('/api/mfa/setup')
+      .set('Authorization', `Bearer ${registerBody.accessToken}`)
+      .send();
+    const setupBody = setupResponse.body as SetupResponseBody;
+
+    await request(server)
+      .post('/api/mfa/enable')
+      .set('Authorization', `Bearer ${registerBody.accessToken}`)
+      .send({ code: generateTotpToken(setupBody.secret) })
+      .expect(201);
+
+    const disableResponse = await request(server)
+      .delete('/api/mfa')
+      .set('Authorization', `Bearer ${registerBody.accessToken}`)
+      .send();
+    const disableBody = disableResponse.body as DisableMfaResponseBody;
+
+    expect(disableResponse.status).toBe(200);
+    expect(disableBody.mfaEnabled).toBe(false);
+    expect(disableBody.mfaConfirmedAt).toBeNull();
+    expect(users[0].mfaEnabled).toBe(false);
+    expect(users[0].mfaSecret).toBeNull();
+
+    const loginResponse = await request(server).post('/api/auth/login').send({
+      email: 'leona@example.com',
+      password: 'secret123',
+    });
+    const loginBody = loginResponse.body as LoginResponseBody;
+
+    expect(loginResponse.status).toBe(201);
+    expect(loginBody.mfaRequired).toBe(false);
+    expect(loginBody.accessToken).toEqual(expect.any(String));
+    expect(loginBody.mfaToken).toBeUndefined();
   });
 });

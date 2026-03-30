@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { MODULE_METADATA } from '@nestjs/common/constants';
 import { MfaModule } from './mfa.module';
+import { DisableTotpMfaUseCase } from './application/use-cases/disable-totp-mfa.use-case';
 import { EnableTotpMfaUseCase } from './application/use-cases/enable-totp-mfa.use-case';
 import { SetupTotpMfaUseCase } from './application/use-cases/setup-totp-mfa.use-case';
 import { VerifyTotpLoginUseCase } from './application/use-cases/verify-totp-login.use-case';
@@ -31,6 +32,7 @@ describe('MfaModule', () => {
       },
       SetupTotpMfaUseCase,
       EnableTotpMfaUseCase,
+      DisableTotpMfaUseCase,
       VerifyTotpLoginUseCase,
     ]);
   });

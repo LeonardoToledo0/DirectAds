@@ -239,6 +239,7 @@ Rotas disponiveis:
 
 - `POST /api/mfa/setup`
 - `POST /api/mfa/enable`
+- `DELETE /api/mfa`
 - `POST /api/mfa/verify-login`
 
 Fluxo implementado:
@@ -248,9 +249,10 @@ Fluxo implementado:
 3. o backend devolve `secret`, `otpauthUrl` e `qrCodeDataUrl`
 4. o usuario escaneia o QR code no Microsoft Authenticator ou app equivalente
 5. o usuario confirma o primeiro codigo em `POST /api/mfa/enable`
-6. nos proximos logins, `POST /api/auth/login` retorna `mfaRequired=true` e `mfaToken`
-7. o usuario envia o codigo atual para `POST /api/mfa/verify-login`
-8. o backend valida o TOTP e so entao emite o JWT final
+6. se quiser remover o segundo fator depois, chama `DELETE /api/mfa`
+7. nos proximos logins, `POST /api/auth/login` retorna `mfaRequired=true` e `mfaToken` enquanto o MFA estiver ativo
+8. o usuario envia o codigo atual para `POST /api/mfa/verify-login`
+9. o backend valida o TOTP e so entao emite o JWT final
 
 ### Tasks
 
@@ -304,6 +306,7 @@ Fluxos implementados:
 - rota protegida para usuario autenticado
 - setup de MFA por QR code
 - ativacao do MFA por confirmacao de codigo TOTP
+- remocao autenticada do MFA com limpeza do estado TOTP
 - login em duas etapas quando `mfaEnabled=true`
 
 Payload atual do token final:
@@ -391,6 +394,13 @@ Verifique:
 - se o `mfaToken` retornado por `POST /api/auth/login` esta sendo reutilizado em `POST /api/mfa/verify-login`
 - se o codigo de 6 digitos veio do app autenticador certo
 
+### O MFA nao foi removido
+
+Verifique:
+
+- se a requisicao foi feita em `DELETE /api/mfa`
+- se o token JWT do usuario autenticado foi enviado
+- se o usuario realmente estava autenticado com a conta correta
 ### O QR code nao foi aceito
 
 Verifique:
@@ -405,6 +415,7 @@ Verifique:
 - [setup.md](e:/directads/docs/setup.md)
 - [api.md](e:/directads/docs/api.md)
 - [tasks-log.md](e:/directads/docs/tasks-log.md)
+
 
 
 

@@ -105,6 +105,7 @@ Fluxo esperado:
 4. gere um codigo de 6 digitos no app
 5. chame `POST /api/mfa/enable` com esse codigo
 6. nos proximos logins, use `POST /api/auth/login` e depois `POST /api/mfa/verify-login`
+7. se quiser desabilitar o MFA, use `DELETE /api/mfa` autenticado com JWT
 
 ## 10. Trocar a senha do usuario autenticado
 
@@ -117,7 +118,14 @@ POST /api/auth/change-password
   "newPassword": "secret456"
 }
 ```
-## 11. Rodar validacoes
+## 11. Remover o MFA do usuario autenticado
+
+Use o endpoint protegido abaixo depois de estar autenticado:
+
+```txt
+DELETE /api/mfa
+```
+## 12. Rodar validacoes
 
 ```bash
 yarn lint
@@ -206,3 +214,14 @@ Acao:
 - gere o setup novamente em `POST /api/mfa/setup`
 - use o `otpauthUrl` como alternativa para importacao manual
 
+
+### O MFA nao foi removido
+
+Sintoma:
+
+- o login continua exigindo `mfaRequired=true` mesmo apos a tentativa de remocao
+
+Acao:
+
+- confirme se `DELETE /api/mfa` respondeu com `200`
+- faca login novamente para validar o novo estado

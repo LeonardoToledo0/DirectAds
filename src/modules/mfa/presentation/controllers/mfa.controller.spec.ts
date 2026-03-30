@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MfaController } from './mfa.controller';
+import { DisableTotpMfaUseCase } from '../../application/use-cases/disable-totp-mfa.use-case';
 import { EnableTotpMfaUseCase } from '../../application/use-cases/enable-totp-mfa.use-case';
 import { SetupTotpMfaUseCase } from '../../application/use-cases/setup-totp-mfa.use-case';
 import { VerifyTotpLoginUseCase } from '../../application/use-cases/verify-totp-login.use-case';
@@ -8,11 +9,13 @@ describe('MfaController', () => {
   let controller: MfaController;
   let setupTotpMfaUseCase: { execute: jest.Mock };
   let enableTotpMfaUseCase: { execute: jest.Mock };
+  let disableTotpMfaUseCase: { execute: jest.Mock };
   let verifyTotpLoginUseCase: { execute: jest.Mock };
 
   beforeEach(async () => {
     setupTotpMfaUseCase = { execute: jest.fn() };
     enableTotpMfaUseCase = { execute: jest.fn() };
+    disableTotpMfaUseCase = { execute: jest.fn() };
     verifyTotpLoginUseCase = { execute: jest.fn() };
 
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -20,6 +23,7 @@ describe('MfaController', () => {
       providers: [
         { provide: SetupTotpMfaUseCase, useValue: setupTotpMfaUseCase },
         { provide: EnableTotpMfaUseCase, useValue: enableTotpMfaUseCase },
+        { provide: DisableTotpMfaUseCase, useValue: disableTotpMfaUseCase },
         { provide: VerifyTotpLoginUseCase, useValue: verifyTotpLoginUseCase },
       ],
     }).compile();
@@ -44,6 +48,14 @@ describe('MfaController', () => {
         { code: '123456' },
       ),
     ).resolves.toBe('enabled');
+  });
+
+  it('disables TOTP MFA for the authenticated user', async () => {
+    disableTotpMfaUseCase.execute.mockResolvedValue('disabled');
+
+    await expect(
+      controller.disable({ sub: 'user-1', email: 'leona@example.com' }),
+    ).resolves.toBe('disabled');
   });
 
   it('verifies the TOTP login challenge', async () => {
